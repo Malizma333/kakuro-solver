@@ -1,8 +1,6 @@
-const boardConstraints = {min: 5, max: 50, default: 10}
-
 export class Board {
   static readonly minDimension = 5;
-  static readonly maxDimension = 50;
+  static readonly maxDimension = 15;
   static readonly defaultDimension = 10;
 
   width: number;
