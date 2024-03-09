@@ -1,14 +1,50 @@
-import { Board } from "@/lib/board"
+import { CONSTRAINTS as Constraints } from "@/lib/board";
+import type { BoardType, BoardCellType } from "@/lib/board";
 
 export default function ToolbarComponent(
   {props}:{props: {
-    board: Board,
-    setWidth: Function,
-    setHeight: Function,
+    board: BoardType, setBoard: Function,
     toolPage: number, setToolPage: Function,
     swatch: 0 | 1, setSwatch: Function
   }}
 ) {
+  const setWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newWidth = Math.min(Constraints.max, Math.max(Constraints.min, parseInt(e.target.value)));
+    console.log(props.board.state);
+    const boardState = [...props.board.state];
+
+    if(boardState.length < newWidth) {
+      boardState.push(
+        new Array(boardState[0].length).fill(null)
+        .map(() => {return {type:0, data:[]} as BoardCellType})
+      );
+    }
+
+    if(boardState.length > newWidth) {
+      boardState.pop();
+    }
+    
+    props.setBoard({...props.board, state: boardState, width: newWidth});
+  }
+
+  const setHeight = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newHeight = Math.min(Constraints.max, Math.max(Constraints.min, parseInt(e.target.value)));
+    console.log(props.board.state);
+    const boardState = [...props.board.state];
+
+    for(let i = 0; i < boardState.length; i++) {
+      if(boardState[i].length < newHeight) {
+        boardState[i].push({type:0, data:[]} as BoardCellType);
+      }
+  
+      if(boardState[i].length > newHeight) {
+        boardState[i].pop();
+      }
+    }
+    
+    props.setBoard({...props.board, state: boardState, height: newHeight});
+  }
+
   return (
     <div className="relative w-1/2 h-14 flex justify-center items-center">
       <button
@@ -25,29 +61,21 @@ export default function ToolbarComponent(
           <input className="border rounded-lg bg-black w-10"
             id="width"
             type="number"
-            min={Board.minDimension}
-            max={Board.maxDimension}
-            placeholder={Board.defaultDimension.toString()}
+            min={Constraints.min}
+            max={Constraints.max}
+            placeholder={Constraints.default.toString()}
             value={props.board.width}
-            onChange={(e) => {
-              const newWidth = Math.min(Board.maxDimension, Math.max(Board.minDimension, parseInt(e.target.value)));
-              props.board.reset(newWidth, undefined);
-              props.setWidth(newWidth);
-            }}
+            onChange={setWidth}
           />
           <label className="mr-3 ml-6" htmlFor="height">Height</label>
           <input className="border rounded-lg bg-black w-10"
             id="height"
             type="number"
-            min={Board.minDimension}
-            max={Board.maxDimension}
-            placeholder={Board.defaultDimension.toString()}
+            min={Constraints.min}
+            max={Constraints.max}
+            placeholder={Constraints.default.toString()}
             value={props.board.height}
-            onChange={(e) => {
-              const newHeight = Math.min(Board.maxDimension, Math.max(Board.minDimension, parseInt(e.target.value)));
-              props.board.reset(undefined, newHeight);
-              props.setHeight(newHeight);
-            }}
+            onChange={setHeight}
           />
         </div>
       }
