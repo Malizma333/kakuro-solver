@@ -6,7 +6,7 @@ export default function ToolbarComponent(
     setWidth: Function,
     setHeight: Function,
     toolPage: number, setToolPage: Function,
-    swatch: boolean, setSwatch: Function
+    swatch: 0 | 1, setSwatch: Function
   }}
 ) {
   return (
@@ -55,12 +55,12 @@ export default function ToolbarComponent(
       {props.toolPage === 1 &&
         <div className="flex justify-center items-center">
           <button className="border rounded-l-lg bg-black w-10 h-5 border-neutral-300 disabled:border-2"
-            disabled={props.swatch}
-            onClick={() => props.setSwatch(true)}
+            disabled={props.swatch === 0}
+            onClick={() => props.setSwatch(0)}
           />
           <button className="border rounded-r-lg bg-white w-10 h-5 border-neutral-300 disabled:border-2"
-            disabled={!props.swatch}
-            onClick={() => props.setSwatch(false)}
+            disabled={props.swatch === 1}
+            onClick={() => props.setSwatch(1)}
           />
         </div>
       }

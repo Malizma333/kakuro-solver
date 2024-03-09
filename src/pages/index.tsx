@@ -11,16 +11,17 @@ export default function Home() {
   const [width, setWidth] = useState(board.width);
   const [height, setHeight] = useState(board.height);
   const [toolPage, setToolPage] = useState(0);
-  const [swatch, setSwatch] = useState(false);
+  const [swatch, setSwatch] = useState(0 as 0 | 1);
 
   const toolbarProps = {board, setWidth, setHeight, toolPage, setToolPage, swatch, setSwatch};
+  const boardProps = {board, swatch};
 
   return (
     <main
       className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
     >
       <ToolbarComponent props={toolbarProps}></ToolbarComponent>
-      <BoardComponent board={board}></BoardComponent>
+      <BoardComponent props={boardProps}></BoardComponent>
     </main>
   );
 }
