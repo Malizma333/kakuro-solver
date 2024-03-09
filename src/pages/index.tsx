@@ -11,8 +11,9 @@ export default function Home() {
   const [width, setWidth] = useState(board.width);
   const [height, setHeight] = useState(board.height);
   const [toolPage, setToolPage] = useState(0);
+  const [swatch, setSwatch] = useState(false);
 
-  const toolbarProps = {board, setWidth, setHeight, toolPage, setToolPage};
+  const toolbarProps = {board, setWidth, setHeight, toolPage, setToolPage, swatch, setSwatch};
 
   return (
     <main
