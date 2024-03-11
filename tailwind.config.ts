@@ -13,11 +13,11 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "diagonal": `linear-gradient(to top right,
-          rgba(0,0,0,0) 0%,
-          rgba(0,0,0,0) calc(50% - 0.8px),
-          rgba(0,0,0,1) 50%,
-          rgba(0,0,0,0) calc(50% + 0.8px),
-          rgba(0,0,0,0) 100%)`
+          rgba(255,255,255,0) 0%,
+          rgba(255,255,255,0) calc(50% - 0.8px),
+          rgba(255,255,255,1) 50%,
+          rgba(255,255,255,0) calc(50% + 0.8px),
+          rgba(255,255,255,0) 100%)`
       },
     },
   },
