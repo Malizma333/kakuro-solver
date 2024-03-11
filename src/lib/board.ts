@@ -1,6 +1,6 @@
 const CONSTRAINTS = Object.freeze({
   MIN: 5,
-  MAX: 15,
+  MAX: 20,
   DEF: 10
 });
 
@@ -34,6 +34,13 @@ export interface BoardCellType {
   lengthData: number[];
 }
 
-export function SolveBoard(board: BoardType) {
-  return board;
+export function SolveBoard(boardState: BoardCellType[][]) {
+  for(let i = 0; i < boardState.length; i++) {
+    for(let j = 0; j < boardState[i].length; j++) {
+      if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
+        boardState[i][j].displayData = ['1'];
+      }
+    }
+  }
+  return boardState;
 }

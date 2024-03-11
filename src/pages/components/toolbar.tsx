@@ -1,5 +1,5 @@
-import { CELL_TYPE, CONSTRAINTS as Constraints, SolveBoard } from "@/lib/board";
-import type { BoardType, BoardCellType } from "@/lib/board";
+import { CELL_TYPE, CONSTRAINTS, SolveBoard, Board } from "@/lib/board";
+import type { BoardType, BoardCellType, } from "@/lib/board";
 import { TOOL_PAGE } from "@/lib/toolpage";
 
 function distributeHints(boardState: BoardCellType[][]) {
@@ -75,7 +75,7 @@ function removeHints(boardState: BoardCellType[][]) {
       boardState[i][j].lengthData = [-1,-1];
     }
   }
-  
+
   return boardState;
 }
 
@@ -86,10 +86,8 @@ export default function ToolbarComponent(
     swatch: 0 | 1, setSwatch: Function
   }}
 ) {
-  if(props.toolPage === TOOL_PAGE.HIDDEN) return;
-
   const setWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newWidth = Math.min(Constraints.MAX, Math.max(Constraints.MIN, parseInt(e.target.value)));
+    const newWidth = Math.min(CONSTRAINTS.MAX, Math.max(CONSTRAINTS.MIN, parseInt(e.target.value)));
     const boardState = [...props.board.state];
   
     if(boardState.length < newWidth) {
@@ -107,7 +105,7 @@ export default function ToolbarComponent(
   }
   
   const setHeight = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newHeight = Math.min(Constraints.MAX, Math.max(Constraints.MIN, parseInt(e.target.value)));
+    const newHeight = Math.min(CONSTRAINTS.MAX, Math.max(CONSTRAINTS.MIN, parseInt(e.target.value)));
     const boardState = [...props.board.state];
   
     for(let i = 0; i < boardState.length; i++) {
@@ -125,20 +123,22 @@ export default function ToolbarComponent(
 
   return (
     <div className="relative w-1/2 h-14 flex justify-center items-center">
-      <button
-        className="absolute left-0 border rounded-lg bg-black w-10 disabled:opacity-0"
-        disabled={props.toolPage === TOOL_PAGE.SIZE}
-        onClick={() => {
-          if(props.toolPage === TOOL_PAGE.HINTS) {
-            const boardState = removeHints([...props.board.state]);
-            props.setBoard({...props.board, state: boardState});
-          }
-          
-          props.setToolPage(props.toolPage - 1)
-        }}
-      >
-        {"<"}
-      </button>
+      {props.toolPage !== TOOL_PAGE.HIDDEN &&
+        <button
+          className="absolute left-0 border rounded-lg bg-black w-10 disabled:opacity-0"
+          disabled={props.toolPage === TOOL_PAGE.SIZE}
+          onClick={() => {
+            if(props.toolPage === TOOL_PAGE.HINTS) {
+              const boardState = removeHints([...props.board.state]);
+              props.setBoard({...props.board, state: boardState});
+            }
+            
+            props.setToolPage(props.toolPage - 1);
+          }}
+        >
+          {"<"}
+        </button>
+      }
 
       {props.toolPage === TOOL_PAGE.SIZE &&
         <div className="flex justify-center items-center">
@@ -146,9 +146,9 @@ export default function ToolbarComponent(
           <input className="border rounded-lg bg-black w-10"
             id="width"
             type="number"
-            min={Constraints.MIN}
-            max={Constraints.MAX}
-            placeholder={Constraints.DEF.toString()}
+            min={CONSTRAINTS.MIN}
+            max={CONSTRAINTS.MAX}
+            placeholder={CONSTRAINTS.DEF.toString()}
             value={props.board.width}
             onChange={setWidth}
           />
@@ -156,9 +156,9 @@ export default function ToolbarComponent(
           <input className="border rounded-lg bg-black w-10"
             id="height"
             type="number"
-            min={Constraints.MIN}
-            max={Constraints.MAX}
-            placeholder={Constraints.DEF.toString()}
+            min={CONSTRAINTS.MIN}
+            max={CONSTRAINTS.MAX}
+            placeholder={CONSTRAINTS.DEF.toString()}
             value={props.board.height}
             onChange={setHeight}
           />
@@ -183,26 +183,39 @@ export default function ToolbarComponent(
           <button className="border rounded bg-black w-20 h-5 border-neutral-300 flex items-center justify-center"
             onClick={() => {
               props.setToolPage(-1);
-              props.setBoard(SolveBoard(props.board));
+              props.setBoard({...props.board, state: SolveBoard(props.board.state)});
             }}
           >Solve</button>
         </div>
       }
 
-      <button
-        className="absolute right-0 border rounded-lg bg-black w-10 disabled:opacity-0"
-        disabled={props.toolPage === TOOL_PAGE.HINTS}
-        onClick={() => {
-          if(props.toolPage === TOOL_PAGE.COLOR) {
-            const boardState = distributeHints([...props.board.state]);
-            props.setBoard({...props.board, state: boardState});
-          }
+      {props.toolPage === TOOL_PAGE.HIDDEN &&
+        <div className="flex justify-center items-center">
+          <button className="border rounded bg-black w-28 h-7 border-neutral-300 flex items-center justify-center"
+            onClick={() => {
+              props.setToolPage(0);
+              props.setBoard(Board);
+            }}
+          >New Puzzle</button>
+        </div>
+      }
 
-          props.setToolPage(props.toolPage + 1)
-        }}
-      >
-        {">"}
-      </button>
+      {props.toolPage !== TOOL_PAGE.HIDDEN &&
+        <button
+          className="absolute right-0 border rounded-lg bg-black w-10 disabled:opacity-0"
+          disabled={props.toolPage === TOOL_PAGE.HINTS}
+          onClick={() => {
+            if(props.toolPage === TOOL_PAGE.COLOR) {
+              const boardState = distributeHints([...props.board.state]);
+              props.setBoard({...props.board, state: boardState});
+            }
+
+            props.setToolPage(props.toolPage + 1);
+          }}
+        >
+          {">"}
+        </button>
+      }
     </div>
   )
 }

@@ -107,11 +107,21 @@ function FilledBoard(board: BoardType) {
           case CELL_TYPE.NONE:
             return <div className={`border ${cellSize} bg-black`} key={j}/>
           case CELL_TYPE.PUZZLE:
-            return <div className={`border ${cellSize} bg-white`} key={j}/>
+            return <div className={`${cellSize} bg-white text-black flex justify-center items-center`}>
+              {board.state[i][j].displayData[0]}
+            </div>
           case CELL_TYPE.HINT:
-            return <div className={`border ${cellSize} bg-black bg-diagonal`} key={j}>
-              <div className={`${halfSize} bg-transparent text-center float-right`}>{board.state[i][j].displayData[0]}</div>
-              <div className={`${halfSize} bg-transparent text-center`}>{board.state[i][j].displayData[1]}</div>
+            return <div className={`border block ${cellSize} bg-black bg-diagonal`} key={j}>
+              <input
+                className={`${halfSize} bg-transparent text-center float-right`}
+                disabled
+                value={board.state[i][j].displayData[0]}
+              />
+              <input
+                className={`${halfSize} bg-transparent text-center`}
+                disabled
+                value={board.state[i][j].displayData[1]}
+              />
             </div>
           default:
             return null
