@@ -43,14 +43,14 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
       min={3}
       max={45}
       placeholder="_"
-      value={board.state[i][j].displayData[0] || ''}
+      value={board.state[i][j].displayData[1] || ''}
       onChange={(e) => {
         const boardState = [...board.state];
         const newValue = parseInt(e.target.value);
         if(e.target.value === '') {
-          boardState[i][j].displayData[0] = ''
+          boardState[i][j].displayData[1] = ''
         } else if(!isNaN(newValue)) {
-          boardState[i][j].displayData[0] = Math.max(3, Math.min(45, newValue)).toString();
+          boardState[i][j].displayData[1] = Math.max(3, Math.min(45, newValue)).toString();
         }
         setBoard({...board, state: boardState} as BoardType)
       }}
@@ -62,14 +62,14 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
       min={3}
       max={45}
       placeholder="_"
-      value={board.state[i][j].displayData[1] || ''}
+      value={board.state[i][j].displayData[0] || ''}
       onChange={(e) => {
         const boardState = [...board.state];
         const newValue = parseInt(e.target.value);
         if(e.target.value === '') {
-          boardState[i][j].displayData[1] = ''
+          boardState[i][j].displayData[0] = ''
         } else if(!isNaN(newValue)) {
-          boardState[i][j].displayData[1] = Math.max(3, Math.min(45, newValue)).toString();
+          boardState[i][j].displayData[0] = Math.max(3, Math.min(45, newValue)).toString();
         }
         setBoard({...board, state: boardState} as BoardType)
       }}
@@ -115,12 +115,12 @@ function FilledBoard(board: BoardType) {
               <input
                 className={`${halfSize} bg-transparent text-center float-right`}
                 disabled
-                value={board.state[i][j].displayData[0]}
+                value={board.state[i][j].displayData[1]}
               />
               <input
                 className={`${halfSize} bg-transparent text-center`}
                 disabled
-                value={board.state[i][j].displayData[1]}
+                value={board.state[i][j].displayData[0]}
               />
             </div>
           default:

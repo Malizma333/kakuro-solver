@@ -34,13 +34,59 @@ export interface BoardCellType {
   lengthData: number[];
 }
 
-export function SolveBoard(boardState: BoardCellType[][]) {
+let GetSummation: Function;
+
+export async function InitSummation() {
+  const data = await fetch("sums.json").then(r => r.json());
+  GetSummation = (size: number, sum: number) => {
+    return data[sum - 3][size - 2];
+  }
+}
+
+function ConstructSuperpos(boardState: BoardCellType[][]) {
+  const multiStateBoard = [] as number[][][];
+
   for(let i = 0; i < boardState.length; i++) {
+    multiStateBoard.push([] as number[][]);
     for(let j = 0; j < boardState[i].length; j++) {
-      if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-        boardState[i][j].displayData = ['1'];
+      if(boardState[i][j].type !== CELL_TYPE.PUZZLE) {
+        multiStateBoard[i].push([]);
+        continue;
       }
+
+      const superposSet = [] as number[];
+
+      for(let hintCol = j; hintCol >= 0; hintCol--) {
+        if(boardState[i][hintCol].type === CELL_TYPE.NONE) break;
+        if(boardState[i][hintCol].type === CELL_TYPE.HINT) {
+          superposSet.push(...GetSummation(
+            boardState[i][hintCol].lengthData[0],
+            parseInt(boardState[i][hintCol].displayData[0])
+          ));
+          break;
+        }
+      }
+
+      for(let hintRow = i; hintRow >= 0; hintRow--) {
+        if(boardState[hintRow][j].type === CELL_TYPE.NONE) break;
+        if(boardState[hintRow][j].type === CELL_TYPE.HINT) {
+          superposSet.push(...GetSummation(
+            boardState[hintRow][j].lengthData[1],
+            parseInt(boardState[hintRow][j].displayData[1])
+          ));
+          break;
+        }
+      }
+
+      multiStateBoard[i].push(superposSet);
     }
   }
+
+  return multiStateBoard;
+}
+
+export function SolveBoard(boardState: BoardCellType[][]) {
+  const entropicBoard = ConstructSuperpos(boardState);
+
   return boardState;
 }
