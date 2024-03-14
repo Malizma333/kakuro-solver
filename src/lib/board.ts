@@ -87,6 +87,7 @@ function ConstructSuperpos(boardState: BoardCellType[][]) {
 
 export function SolveBoard(boardState: BoardCellType[][]) {
   const entropicBoard = ConstructSuperpos(boardState);
-
+  console.log(entropicBoard);
+  
   return boardState;
 }

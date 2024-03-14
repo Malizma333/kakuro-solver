@@ -50,6 +50,16 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
         if(e.target.value === '') {
           boardState[i][j].displayData[1] = ''
         } else if(!isNaN(newValue)) {
+          boardState[i][j].displayData[1] = newValue.toString();
+        }
+        setBoard({...board, state: boardState} as BoardType)
+      }}
+      onBlur={(e) => {
+        const boardState = [...board.state];
+        const newValue = parseInt(e.target.value);
+        if(e.target.value === '') {
+          boardState[i][j].displayData[1] = ''
+        } else if(!isNaN(newValue)) {
           boardState[i][j].displayData[1] = Math.max(3, Math.min(45, newValue)).toString();
         }
         setBoard({...board, state: boardState} as BoardType)
@@ -64,6 +74,16 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
       placeholder="_"
       value={board.state[i][j].displayData[0] || ''}
       onChange={(e) => {
+        const boardState = [...board.state];
+        const newValue = parseInt(e.target.value);
+        if(e.target.value === '') {
+          boardState[i][j].displayData[0] = ''
+        } else if(!isNaN(newValue)) {
+          boardState[i][j].displayData[0] = newValue.toString();
+        }
+        setBoard({...board, state: boardState} as BoardType)
+      }}
+      onBlur={(e) => {
         const boardState = [...board.state];
         const newValue = parseInt(e.target.value);
         if(e.target.value === '') {
@@ -107,7 +127,7 @@ function FilledBoard(board: BoardType) {
           case CELL_TYPE.NONE:
             return <div className={`border ${cellSize} bg-black`} key={j}/>
           case CELL_TYPE.PUZZLE:
-            return <div className={`${cellSize} bg-white text-black flex justify-center items-center`}>
+            return <div className={`${cellSize} bg-white text-black flex justify-center items-center`} key={j}>
               {board.state[i][j].displayData[0]}
             </div>
           case CELL_TYPE.HINT:
