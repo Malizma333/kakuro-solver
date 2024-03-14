@@ -54,31 +54,42 @@ function ConstructSuperpos(boardState: BoardCellType[][]) {
         continue;
       }
 
-      const superposSet = [] as number[];
+      const colArray = [] as number[];
+      const rowArray = [] as number[];
 
       for(let hintCol = j; hintCol >= 0; hintCol--) {
         if(boardState[i][hintCol].type === CELL_TYPE.NONE) break;
         if(boardState[i][hintCol].type === CELL_TYPE.HINT) {
-          superposSet.push(...GetSummation(
+          GetSummation(
             boardState[i][hintCol].lengthData[0],
             parseInt(boardState[i][hintCol].displayData[0])
-          ));
+          ).forEach((item: number) => colArray.push(item))
           break;
         }
       }
-
+      
       for(let hintRow = i; hintRow >= 0; hintRow--) {
         if(boardState[hintRow][j].type === CELL_TYPE.NONE) break;
         if(boardState[hintRow][j].type === CELL_TYPE.HINT) {
-          superposSet.push(...GetSummation(
+          GetSummation(
             boardState[hintRow][j].lengthData[1],
             parseInt(boardState[hintRow][j].displayData[1])
-          ));
+          ).forEach((item: number) => rowArray.push(item))
           break;
         }
       }
 
-      multiStateBoard[i].push(superposSet);
+      const superposition = [] as number[];
+
+      if(rowArray.length === 0) {
+        colArray.forEach((i: number) => superposition.push(i))
+      } else if(colArray.length === 0) {
+        rowArray.forEach((i: number) => superposition.push(i))
+      } else {
+        rowArray.forEach((i: number) => i in colArray && superposition.push(i))
+      }
+
+      multiStateBoard[i].push(superposition);
     }
   }
 
@@ -87,7 +98,6 @@ function ConstructSuperpos(boardState: BoardCellType[][]) {
 
 export function SolveBoard(boardState: BoardCellType[][]) {
   const entropicBoard = ConstructSuperpos(boardState);
-  console.log(entropicBoard);
-  
+
   return boardState;
 }
