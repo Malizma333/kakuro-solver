@@ -1,4 +1,4 @@
-import { Board, InitSummation } from "@/lib/board";
+import { InitSummation, NewBoard } from "@/lib/board";
 import BoardComponent from "./components/board";
 import ToolbarComponent from "./components/toolbar";
 import { useState, useEffect } from "react";
@@ -7,7 +7,7 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const [board, setBoard] = useState(Board);
+  const [board, setBoard] = useState(NewBoard());
   const [toolPage, setToolPage] = useState(0);
   const [swatch, setSwatch] = useState(0 as 0 | 1);
 

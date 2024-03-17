@@ -1,14 +1,14 @@
-import { CELL_TYPE, type BoardType } from "@/lib/board"
+import { CELL_TYPE, HINT_CONSTRAINTS, type BoardType } from "@/lib/board"
 import { TOOL_PAGE } from "@/lib/toolpage"
 
-const cellSize = 'w-12 h-12'
-const halfSize = 'w-6 h-6'
+const actualSize = 12;
+const cd = `w-${actualSize} h-${actualSize}`, hcd = `w-${actualSize >> 2} h-${actualSize >> 2}`;
 
 function SizeBoard(board: BoardType) {
   return [...Array(board.width)].map((_,i) =>
     <div key={i}>
       {[...Array(board.height)].map((_,j) =>
-        <div className={`border ${cellSize} bg-black`} key={j}/>
+        <div className={`border ${cd} bg-black`} key={j}/>
       )}
     </div>
   )
@@ -19,11 +19,12 @@ function ColorBoard(board: BoardType, setBoard: Function, swatch: 0 | 1) {
     <div key={i}>
       {[...Array(board.height)].map((_,j) => {
         return <div
-          className={`border ${cellSize} cursor-pointer bg-${
+          className={`border ${cd} cursor-pointer bg-${
             board.state[i][j].type === CELL_TYPE.PUZZLE ? 'white' : 'black'
           }`}
           key={j}
           onClick={() => {
+            if(i === 0 || j === 0) return;
             const boardState = [...board.state];
             boardState[i][j].type = swatch;
             setBoard({...board, state: boardState} as BoardType);
@@ -38,10 +39,10 @@ function ColorBoard(board: BoardType, setBoard: Function, swatch: 0 | 1) {
 function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
   return <div>
     {board.state[i][j].lengthData[1] > -1 ? <input
-      className={`${halfSize} bg-transparent text-center float-right`}
+      className={`${hcd} bg-transparent text-center float-right`}
       type='number'
-      min={3}
-      max={45}
+      min={HINT_CONSTRAINTS.MIN}
+      max={HINT_CONSTRAINTS.MAX}
       placeholder="_"
       value={board.state[i][j].displayData[1] || ''}
       onChange={(e) => {
@@ -60,17 +61,20 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
         if(e.target.value === '') {
           boardState[i][j].displayData[1] = ''
         } else if(!isNaN(newValue)) {
-          boardState[i][j].displayData[1] = Math.max(3, Math.min(45, newValue)).toString();
+          boardState[i][j].displayData[1] = Math.max(
+            HINT_CONSTRAINTS.MIN, Math.min(
+              HINT_CONSTRAINTS.MAX, newValue
+          )).toString();
         }
         setBoard({...board, state: boardState} as BoardType)
       }}
-    /> : <div className={`${halfSize} bg-transparent text-center float-right`}/>
+    /> : <div className={`${hcd} bg-transparent text-center float-right`}/>
     }
     {board.state[i][j].lengthData[0] > -1 && <input
-      className={`${halfSize} bg-transparent text-center`}
+      className={`${hcd} bg-transparent text-center`}
       type='number'
-      min={3}
-      max={45}
+      min={HINT_CONSTRAINTS.MIN}
+      max={HINT_CONSTRAINTS.MAX}
       placeholder="_"
       value={board.state[i][j].displayData[0] || ''}
       onChange={(e) => {
@@ -89,7 +93,10 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
         if(e.target.value === '') {
           boardState[i][j].displayData[0] = ''
         } else if(!isNaN(newValue)) {
-          boardState[i][j].displayData[0] = Math.max(3, Math.min(45, newValue)).toString();
+          boardState[i][j].displayData[0] = Math.max(
+            HINT_CONSTRAINTS.MIN, Math.min(
+              HINT_CONSTRAINTS.MAX, newValue
+          )).toString();
         }
         setBoard({...board, state: boardState} as BoardType)
       }}
@@ -103,11 +110,11 @@ function TextBoard(board: BoardType, setBoard: Function) {
       {[...Array(board.height)].map((_,j) => {
         switch(board.state[i][j].type) {
           case CELL_TYPE.NONE:
-            return <div className={`border ${cellSize} bg-black`} key={j}/>
+            return <div className={`border ${cd} bg-black`} key={j}/>
           case CELL_TYPE.PUZZLE:
-            return <div className={`border ${cellSize} bg-white`} key={j}/>
+            return <div className={`border ${cd} bg-white`} key={j}/>
           case CELL_TYPE.HINT:
-            return <div className={`border ${cellSize} bg-black bg-diagonal`} key={j}>
+            return <div className={`border ${cd} bg-black bg-diagonal`} key={j}>
               {Hint(i, j, board, setBoard)}
             </div>
           default:
@@ -125,20 +132,20 @@ function FilledBoard(board: BoardType) {
       {[...Array(board.height)].map((_,j) => {
         switch(board.state[i][j].type) {
           case CELL_TYPE.NONE:
-            return <div className={`border ${cellSize} bg-black`} key={j}/>
+            return <div className={`border ${cd} bg-black`} key={j}/>
           case CELL_TYPE.PUZZLE:
-            return <div className={`${cellSize} bg-white text-black flex justify-center items-center`} key={j}>
+            return <div className={`${cd} bg-white text-black flex justify-center items-center`} key={j}>
               {board.state[i][j].displayData[0]}
             </div>
           case CELL_TYPE.HINT:
-            return <div className={`border block ${cellSize} bg-black bg-diagonal`} key={j}>
+            return <div className={`border block ${cd} bg-black bg-diagonal`} key={j}>
               <input
-                className={`${halfSize} bg-transparent text-center float-right`}
+                className={`${hcd} bg-transparent text-center float-right`}
                 disabled
                 value={board.state[i][j].displayData[1]}
               />
               <input
-                className={`${halfSize} bg-transparent text-center`}
+                className={`${hcd} bg-transparent text-center`}
                 disabled
                 value={board.state[i][j].displayData[0]}
               />

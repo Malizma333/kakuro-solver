@@ -1,4 +1,4 @@
-import { CELL_TYPE, CONSTRAINTS, SolveBoard, Board } from "@/lib/board";
+import { CELL_TYPE, BOARD_CONSTRAINTS, SolveBoard, NewBoard } from "@/lib/board";
 import type { BoardType, BoardCellType, } from "@/lib/board";
 import { TOOL_PAGE } from "@/lib/toolpage";
 
@@ -87,7 +87,7 @@ export default function ToolbarComponent(
   }}
 ) {
   const setWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newWidth = Math.min(CONSTRAINTS.MAX, Math.max(CONSTRAINTS.MIN, parseInt(e.target.value)));
+    const newWidth = Math.min(BOARD_CONSTRAINTS.MAX, Math.max(BOARD_CONSTRAINTS.MIN, parseInt(e.target.value)));
     const boardState = [...props.board.state];
   
     if(boardState.length < newWidth) {
@@ -105,7 +105,7 @@ export default function ToolbarComponent(
   }
   
   const setHeight = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newHeight = Math.min(CONSTRAINTS.MAX, Math.max(CONSTRAINTS.MIN, parseInt(e.target.value)));
+    const newHeight = Math.min(BOARD_CONSTRAINTS.MAX, Math.max(BOARD_CONSTRAINTS.MIN, parseInt(e.target.value)));
     const boardState = [...props.board.state];
   
     for(let i = 0; i < boardState.length; i++) {
@@ -146,9 +146,9 @@ export default function ToolbarComponent(
           <input className="border rounded-lg bg-black w-10"
             id="width"
             type="number"
-            min={CONSTRAINTS.MIN}
-            max={CONSTRAINTS.MAX}
-            placeholder={CONSTRAINTS.DEF.toString()}
+            min={BOARD_CONSTRAINTS.MIN}
+            max={BOARD_CONSTRAINTS.MAX}
+            placeholder={BOARD_CONSTRAINTS.DEF.toString()}
             value={props.board.width}
             onChange={setWidth}
           />
@@ -156,9 +156,9 @@ export default function ToolbarComponent(
           <input className="border rounded-lg bg-black w-10"
             id="height"
             type="number"
-            min={CONSTRAINTS.MIN}
-            max={CONSTRAINTS.MAX}
-            placeholder={CONSTRAINTS.DEF.toString()}
+            min={BOARD_CONSTRAINTS.MIN}
+            max={BOARD_CONSTRAINTS.MAX}
+            placeholder={BOARD_CONSTRAINTS.DEF.toString()}
             value={props.board.height}
             onChange={setHeight}
           />
@@ -194,7 +194,7 @@ export default function ToolbarComponent(
           <button className="border rounded bg-black w-28 h-7 border-neutral-300 flex items-center justify-center"
             onClick={() => {
               props.setToolPage(0);
-              props.setBoard(Board);
+              props.setBoard(NewBoard());
             }}
           >New Puzzle</button>
         </div>
