@@ -1,14 +1,14 @@
 import { CELL_TYPE, HINT_CONSTRAINTS, type BoardType } from "@/lib/board"
 import { TOOL_PAGE } from "@/lib/toolpage"
 
-const actualSize = 12;
-const cd = `w-${actualSize} h-${actualSize}`, hcd = `w-${actualSize >> 2} h-${actualSize >> 2}`;
+const cellD = 'w-12 h-12';
+const halfCellD = 'w-6 h-6';
 
 function SizeBoard(board: BoardType) {
   return [...Array(board.width)].map((_,i) =>
     <div key={i}>
       {[...Array(board.height)].map((_,j) =>
-        <div className={`border ${cd} bg-black`} key={j}/>
+        <div className={`border ${cellD} bg-black`} key={j}/>
       )}
     </div>
   )
@@ -19,7 +19,7 @@ function ColorBoard(board: BoardType, setBoard: Function, swatch: 0 | 1) {
     <div key={i}>
       {[...Array(board.height)].map((_,j) => {
         return <div
-          className={`border ${cd} cursor-pointer bg-${
+          className={`border ${cellD} cursor-pointer bg-${
             board.state[i][j].type === CELL_TYPE.PUZZLE ? 'white' : 'black'
           }`}
           key={j}
@@ -39,7 +39,7 @@ function ColorBoard(board: BoardType, setBoard: Function, swatch: 0 | 1) {
 function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
   return <div>
     {board.state[i][j].lengthData[1] > -1 ? <input
-      className={`${hcd} bg-transparent text-center float-right`}
+      className={`${halfCellD} bg-transparent text-center float-right`}
       type='number'
       min={HINT_CONSTRAINTS.MIN}
       max={HINT_CONSTRAINTS.MAX}
@@ -68,10 +68,10 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
         }
         setBoard({...board, state: boardState} as BoardType)
       }}
-    /> : <div className={`${hcd} bg-transparent text-center float-right`}/>
+    /> : <div className={`${halfCellD} bg-transparent text-center float-right`}/>
     }
     {board.state[i][j].lengthData[0] > -1 && <input
-      className={`${hcd} bg-transparent text-center`}
+      className={`${halfCellD} bg-transparent text-center`}
       type='number'
       min={HINT_CONSTRAINTS.MIN}
       max={HINT_CONSTRAINTS.MAX}
@@ -110,11 +110,11 @@ function TextBoard(board: BoardType, setBoard: Function) {
       {[...Array(board.height)].map((_,j) => {
         switch(board.state[i][j].type) {
           case CELL_TYPE.NONE:
-            return <div className={`border ${cd} bg-black`} key={j}/>
+            return <div className={`border ${cellD} bg-black`} key={j}/>
           case CELL_TYPE.PUZZLE:
-            return <div className={`border ${cd} bg-white`} key={j}/>
+            return <div className={`border ${cellD} bg-white`} key={j}/>
           case CELL_TYPE.HINT:
-            return <div className={`border ${cd} bg-black bg-diagonal`} key={j}>
+            return <div className={`border ${cellD} bg-black bg-diagonal`} key={j}>
               {Hint(i, j, board, setBoard)}
             </div>
           default:
@@ -132,20 +132,20 @@ function FilledBoard(board: BoardType) {
       {[...Array(board.height)].map((_,j) => {
         switch(board.state[i][j].type) {
           case CELL_TYPE.NONE:
-            return <div className={`border ${cd} bg-black`} key={j}/>
+            return <div className={`border ${cellD} bg-black`} key={j}/>
           case CELL_TYPE.PUZZLE:
-            return <div className={`${cd} bg-white text-black flex justify-center items-center`} key={j}>
+            return <div className={`${cellD} bg-white text-black flex justify-center items-center`} key={j}>
               {board.state[i][j].displayData[0]}
             </div>
           case CELL_TYPE.HINT:
-            return <div className={`border block ${cd} bg-black bg-diagonal`} key={j}>
+            return <div className={`border block ${cellD} bg-black bg-diagonal`} key={j}>
               <input
-                className={`${hcd} bg-transparent text-center float-right`}
+                className={`${halfCellD} bg-transparent text-center float-right`}
                 disabled
                 value={board.state[i][j].displayData[1]}
               />
               <input
-                className={`${hcd} bg-transparent text-center`}
+                className={`${halfCellD} bg-transparent text-center`}
                 disabled
                 value={board.state[i][j].displayData[0]}
               />

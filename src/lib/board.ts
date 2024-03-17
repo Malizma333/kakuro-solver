@@ -1,3 +1,5 @@
+const DEBUG = process.env.NODE_ENV == "development"
+
 const BOARD_CONSTRAINTS = Object.freeze({ MIN: 5, MAX: 20, DEF: 10 });
 const CELL_TYPE = Object.freeze({ NONE: 0, PUZZLE: 1, HINT: 2 });
 const HINT_CONSTRAINTS = Object.freeze({ MIN: 3, MAX: 45 });
@@ -84,7 +86,7 @@ function ConstructStates(boardState: BoardCellType[][]) {
 
       multiStateBoard[i].push(superposition);
 
-      console.info(`Cell ${i}, ${j}: ${JSON.stringify(superposition)}`);
+      DEBUG && console.info(`Cell ${i}, ${j}: ${JSON.stringify(superposition)}`);
     }
   }
 
@@ -112,7 +114,7 @@ function GetLeastEntropy(board: number[][][], visited: number[]) {
 
   if(pairs.length === 0) mEntropy = 1;
 
-  console.info(`Entropy Pairs (${mEntropy}): ${JSON.stringify(pairs)}`)
+  DEBUG && console.info(`Entropy Pairs (${mEntropy}): ${JSON.stringify(pairs)}`)
 
   return pairs;
 }
@@ -133,7 +135,7 @@ function PropagateCollisions(board: number[][][], visited: number[]) {
 
     if(removeArray.length === 0) break;
 
-    console.info(`Removing ${JSON.stringify(removeArray)}`);
+    DEBUG && console.info(`Removing ${JSON.stringify(removeArray)}`);
 
     for(const v of removeArray) {
       const toRem = v[2];
@@ -172,7 +174,7 @@ function PropagateCollisions(board: number[][][], visited: number[]) {
 }
 
 export function SolveBoard(boardState: BoardCellType[][]) {
-  console.info("Initializing");
+  DEBUG && console.info("Initializing");
   const solutionBoard = ConstructStates(boardState);
   const visited = [] as number[];
 
