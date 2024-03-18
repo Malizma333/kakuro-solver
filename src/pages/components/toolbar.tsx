@@ -1,4 +1,5 @@
-import { CELL_TYPE, BOARD_CONSTRAINTS, SolveBoard, NewBoard } from "@/lib/board";
+import { SolveBoard } from '@/lib/solve';
+import { CELL_TYPE, BOARD_CONSTRAINTS, NewBoard } from "@/lib/board";
 import type { BoardType, BoardCellType, } from "@/lib/board";
 import { TOOL_PAGE } from "@/lib/toolpage";
 
@@ -167,11 +168,11 @@ export default function ToolbarComponent(
 
       {props.toolPage === TOOL_PAGE.COLOR &&
         <div className="flex justify-center items-center">
-          <button className="border rounded-l-lg bg-black w-10 h-5 border-neutral-300 disabled:border-2"
+          <button className="border rounded-l-lg bg-black w-10 h-5 border-red-500 disabled:border-2 hover:enabled:border-red-700"
             disabled={props.swatch === 0}
             onClick={() => props.setSwatch(0)}
           />
-          <button className="border rounded-r-lg bg-white w-10 h-5 border-neutral-300 disabled:border-2"
+          <button className="border rounded-r-lg bg-white w-10 h-5 border-red-500 disabled:border-2 hover:enabled:border-red-700"
             disabled={props.swatch === 1}
             onClick={() => props.setSwatch(1)}
           />
