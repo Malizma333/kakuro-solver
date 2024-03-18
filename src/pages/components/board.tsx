@@ -39,7 +39,7 @@ function ColorBoard(board: BoardType, setBoard: Function, swatch: 0 | 1) {
 function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
   return <div>
     {board.state[i][j].lengthData[1] > -1 ? <input
-      className={`${halfCellD} bg-transparent text-center float-right`}
+      className={`${halfCellD} hide-spinner bg-transparent text-center float-right`}
       type='number'
       min={HINT_CONSTRAINTS.MIN}
       max={HINT_CONSTRAINTS.MAX}
@@ -71,7 +71,7 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
     /> : <div className={`${halfCellD} bg-transparent text-center float-right`}/>
     }
     {board.state[i][j].lengthData[0] > -1 && <input
-      className={`${halfCellD} bg-transparent text-center`}
+      className={`${halfCellD} hide-spinner bg-transparent text-center`}
       type='number'
       min={HINT_CONSTRAINTS.MIN}
       max={HINT_CONSTRAINTS.MAX}
@@ -104,7 +104,7 @@ function Hint(i: number, j: number, board: BoardType, setBoard: Function) {
   </div>
 }
 
-function TextBoard(board: BoardType, setBoard: Function) {
+function TextBoard(board: BoardType, setBoard: Function, invalidHints: number[]) {
   return [...Array(board.width)].map((_,i) =>
     <div key={i}>
       {[...Array(board.height)].map((_,j) => {
@@ -114,7 +114,9 @@ function TextBoard(board: BoardType, setBoard: Function) {
           case CELL_TYPE.PUZZLE:
             return <div className={`border ${cellD} bg-white`} key={j}/>
           case CELL_TYPE.HINT:
-            return <div className={`border ${cellD} bg-black bg-diagonal`} key={j}>
+            return <div className={`border ${cellD} bg-black bg-diagonal ${
+              invalidHints.includes(i*board.height + j) && "border-red-500 border-2"
+            }`} key={j}>
               {Hint(i, j, board, setBoard)}
             </div>
           default:
@@ -163,14 +165,15 @@ export default function BoardComponent(
   {props}:{props: {
     board: BoardType, setBoard: Function,
     swatch: 0 | 1,
-    toolPage: number
+    toolPage: number,
+    invalidHints: number[]
   }}
 ) {
   return (
     <div className="w-full flex-1 m-5 flex justify-center items-center">
       {props.toolPage === TOOL_PAGE.SIZE && SizeBoard(props.board)}
       {props.toolPage === TOOL_PAGE.COLOR && ColorBoard(props.board, props.setBoard, props.swatch)}
-      {props.toolPage === TOOL_PAGE.HINTS && TextBoard(props.board, props.setBoard)}
+      {props.toolPage === TOOL_PAGE.HINTS && TextBoard(props.board, props.setBoard, props.invalidHints)}
       {props.toolPage === TOOL_PAGE.HIDDEN && FilledBoard(props.board)}
     </div>
   )

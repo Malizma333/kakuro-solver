@@ -10,9 +10,10 @@ export default function Home() {
   const [board, setBoard] = useState(NewBoard());
   const [toolPage, setToolPage] = useState(0);
   const [swatch, setSwatch] = useState(0 as 0 | 1);
+  const [invalidHints, setInvalidHints] = useState([] as number[]);
 
-  const toolbarProps = {board, setBoard, toolPage, setToolPage, swatch, setSwatch};
-  const boardProps = {board, setBoard, swatch, toolPage};
+  const toolbarProps = {board, setBoard, toolPage, setToolPage, swatch, setSwatch, setInvalidHints};
+  const boardProps = {board, setBoard, swatch, toolPage, invalidHints};
 
   useEffect(() => {(async () => await InitSummation())()}, []);
 
