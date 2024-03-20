@@ -17,6 +17,31 @@ const SolveState = {
   stack: [] as string[]
 };
 
+function StringifyBoard(transpose = false) {
+  if(transpose) {
+    const boardT = [] as number[][][];
+
+    for(let j = 0; j < SolveState.height; j++) {
+      boardT.push([] as number[][]);
+      for(let i = 0; i < SolveState.width; i++) {
+        boardT[j][i] = SolveState.board[i][j];
+      }
+    }
+
+    return boardT.map(
+      (e) => e.map(
+        (e2) => JSON.stringify(e2)
+      ).join(' ')
+    ).join('\n')
+  } else {
+    return SolveState.board.map(
+      (e) => e.map(
+        (e2) => JSON.stringify(e2)
+      ).join(' ')
+    ).join('\n')
+  }
+}
+
 function ConstructStates(boardState: BoardCellType[][]) {
   SolveState.width = boardState.length;
   SolveState.height = boardState[0].length;
@@ -173,10 +198,22 @@ export function SolveBoard(boardState: BoardCellType[][]) {
 
       const rewindState = JSON.parse(SolveState.stack.pop()||"[[] as number[][][], [] as number[]]"); 
 
-      DEBUG && console.info(`Rewinding:\n${rewindState[0].map((e:number[][]) => e.map((e2) => JSON.stringify(e2)).join(' ')).join('\n')}`);
+      for(let i = 0; i < SolveState.width; i++) {
+        for(let j = 0; j < SolveState.height; j++) {
+          SolveState.board[i][j].length = 0;
+          for(let k = 0; k < rewindState[0][i][j].length; k++) {
+            SolveState.board[i][j].push(rewindState[0][i][j][k]);
+          }
+        }
+      }
 
-      SolveState.board = rewindState[0];
-      SolveState.visit = rewindState[1];
+      SolveState.visit.length = 0;
+      for(let k = 0; k < rewindState[1].length; k++) {
+        SolveState.visit.push(rewindState[1][k]);
+      }
+
+      DEBUG && console.info(`Rewinding:\n${StringifyBoard(true)}`);
+
       continue;
     }
 
@@ -185,12 +222,12 @@ export function SolveBoard(boardState: BoardCellType[][]) {
     const temp = SolveState.board[choice[0]][choice[1]][0];
 
     SolveState.board[choice[0]][choice[1]] = [...removed];
-    DEBUG && console.info(`Pushing:\n${SolveState.board.map((e) => e.map((e2) => JSON.stringify(e2)).join(' ')).join('\n')}`);
+    DEBUG && console.info(`Pushing:\n${StringifyBoard(true)}`);
     SolveState.stack.push(JSON.stringify([SolveState.board, SolveState.visit]));
     SolveState.board[choice[0]][choice[1]] = [temp];
   }
 
-  DEBUG && console.info(`Final:\n${SolveState.board.map((e) => e.map((e2) => JSON.stringify(e2)).join(' ')).join('\n')}`);
+  DEBUG && console.info(`Final:\n${StringifyBoard(true)}`);
 
   for(let i = 0; i < SolveState.width; i++) {
     for(let j = 0; j < SolveState.height; j++) {
@@ -206,6 +243,8 @@ export function SolveBoard(boardState: BoardCellType[][]) {
 }
 
 export function ValidateBoard(boardState: BoardCellType[][]) {
+  DEBUG && console.info(`Checking:\n${StringifyBoard(true)}`);
+
   let total: number;
   const visited = [] as number[];
 
@@ -245,6 +284,7 @@ export function ValidateBoard(boardState: BoardCellType[][]) {
       }
 
       total = 0;
+      visited.length = 0;
 
       for(let k = j+1; k <= j+boardState[i][j].lengthData[0]; k++) {
         total += SolveState.board[i][k][0];
