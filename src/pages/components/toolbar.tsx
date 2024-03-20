@@ -204,17 +204,22 @@ const HintTools = (props: ToolbarProps) =>
 <div className="flex justify-center items-center">
   <button className="border rounded bg-black w-20 h-5 border-neutral-300 flex items-center justify-center"
     onClick={() => triggerSolve(props)}
-  >Solve</button>
+  >{"Solve"}</button>
 </div>
 
 const SolvePageTools = (props: ToolbarProps) =>
 <div className="flex justify-center items-center">
-  <button className="border rounded bg-black w-28 h-7 border-neutral-300 flex items-center justify-center"
+  <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
     onClick={() => {
       props.setToolPage(0);
       props.setBoard(NewBoard());
     }}
-  >New Puzzle</button>
+  >{"New Puzzle"}</button>
+  <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
+    onClick={() => {
+      props.setToolPage(2);
+    }}
+  >{"Back"}</button>
 </div>
 
 export const ToolbarComponent = ({props}:{props:ToolbarProps}) =>
