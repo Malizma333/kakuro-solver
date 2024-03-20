@@ -263,4 +263,6 @@ export function ValidateBoard(boardState: BoardCellType[][]) {
       }
     }
   }
+
+  return true;
 }
