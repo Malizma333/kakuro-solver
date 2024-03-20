@@ -72,6 +72,16 @@ function distributeHints(props: ToolbarProps) {
         chain += 1;
       }
     }
+
+    if(chain < 2) {
+      continue;
+    }
+
+    if(lastNone > -1) {
+      boardState[lastNone][j].type = CELL_TYPE.HINT;
+      boardState[lastNone][j].displayData = ['',''];
+      boardState[lastNone][j].lengthData[1] = boardState.length-lastNone-1;
+    }
   }
   
   props.setBoard({...props.board, state: boardState})
