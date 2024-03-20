@@ -195,7 +195,7 @@ export function SolveBoard(boardState: BoardCellType[][]) {
   for(let i = 0; i < SolveState.width; i++) {
     for(let j = 0; j < SolveState.height; j++) {
       if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-        boardState[i][j].displayData.push(SolveState.board[i][j].join(','));
+        boardState[i][j].displayData = [SolveState.board[i][j].join(',')];
       }
     }
   }
