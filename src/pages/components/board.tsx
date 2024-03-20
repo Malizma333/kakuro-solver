@@ -32,23 +32,23 @@ function setHint(props: BoardProps, i: number, j: number, k: number, inputValue:
 }
 
 const SizeBoard = (props: BoardProps) =>
-[...Array(props.board.width)].map((_,i) =>
-  <div key={i}>
-    {[...Array(props.board.height)].map((_,j) =>
-      <div className={`border ${cellD} bg-black`} key={j}/>
+[...Array(props.board.height)].map((_,j) =>
+  <div key={j} className="flex flex-row">
+    {[...Array(props.board.width)].map((_,i) =>
+      <div className={`border ${cellD} bg-black`} key={i}/>
     )}
   </div>
 )
 
 const ColorBoard = (props: BoardProps) => 
-[...Array(props.board.width)].map((_,i) =>
-  <div key={i}>
-    {[...Array(props.board.height)].map((_,j) =>
+[...Array(props.board.height)].map((_,j) =>
+  <div key={j} className="flex flex-row">
+    {[...Array(props.board.width)].map((_,i) =>
       <div
         className={`border ${cellD} cursor-pointer bg-${
           props.board.state[i][j].type === CELL_TYPE.PUZZLE ? 'white' : 'black'
         }`}
-        key={j}
+        key={i}
         onClick={() => {
           if(i === 0 || j === 0) return;
           const boardState = [...props.board.state];
@@ -80,18 +80,18 @@ const HintCell = (props: BoardProps, i: number, j: number) =>
 </div>
 
 const TextBoard = (props: BoardProps) =>
-[...Array(props.board.width)].map((_,i) =>
-  <div key={i}>
-    {[...Array(props.board.height)].map((_,j) => {
+[...Array(props.board.height)].map((_,j) =>
+  <div key={j} className="flex flex-row">
+    {[...Array(props.board.width)].map((_,i) => {
       switch(props.board.state[i][j].type) {
         case CELL_TYPE.NONE:
-          return <div className={`border ${cellD} bg-black`} key={j}/>
+          return <div className={`border ${cellD} bg-black`} key={i}/>
         case CELL_TYPE.PUZZLE:
-          return <div className={`border ${cellD} bg-white`} key={j}/>
+          return <div className={`border ${cellD} bg-white`} key={i}/>
         case CELL_TYPE.HINT:
           return <div className={`border ${cellD} bg-black bg-diagonal ${
             props.invalidHints.includes(i*props.board.height + j) && "border-red-500 border-2"
-          }`} key={j}>
+          }`} key={i}>
             {HintCell(props, i, j)}
           </div>
         default:
@@ -103,18 +103,18 @@ const TextBoard = (props: BoardProps) =>
 )
 
 const FilledBoard = (props: BoardProps) =>
-[...Array(props.board.width)].map((_,i) =>
-  <div key={i}>
-    {[...Array(props.board.height)].map((_,j) => {
+[...Array(props.board.height)].map((_,j) =>
+  <div key={j} className="flex flex-row">
+    {[...Array(props.board.width)].map((_,i) => {
       switch(props.board.state[i][j].type) {
         case CELL_TYPE.NONE:
-          return <div className={`border ${cellD} bg-black`} key={j}/>
+          return <div className={`border ${cellD} bg-black`} key={i}/>
         case CELL_TYPE.PUZZLE:
-          return <div className={`${cellD} bg-white text-black flex justify-center items-center`} key={j}>
+          return <div className={`${cellD} bg-white text-black flex justify-center items-center`} key={i}>
             {props.board.state[i][j].displayData[0]}
           </div>
         case CELL_TYPE.HINT:
-          return <div className={`border block ${cellD} bg-black bg-diagonal`} key={j}>
+          return <div className={`border block ${cellD} bg-black bg-diagonal`} key={i}>
             <input
               className={`${halfCellD} bg-transparent text-center float-right`}
               disabled
@@ -135,7 +135,7 @@ const FilledBoard = (props: BoardProps) =>
 )
   
 export const BoardComponent = ({props}:{props: BoardProps}) =>
-<div className="w-full flex-1 m-5 flex justify-center items-center">
+<div className="h-full w-full flex-1 m-5 flex flex-col justify-center items-center">
   {props.toolPage === TOOL_PAGE.SIZE && SizeBoard(props)}
   {props.toolPage === TOOL_PAGE.COLOR && ColorBoard(props)}
   {props.toolPage === TOOL_PAGE.HINTS && TextBoard(props)}

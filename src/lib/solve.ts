@@ -23,9 +23,9 @@ function ConstructStates(boardState: BoardCellType[][]) {
   SolveState.board = [] as number[][][];
   SolveState.visit = [] as number[];
 
-  for(let i = 0; i < SolveState.width; i++) {
+  for(let i = 0; i < SolveState.height; i++) {
     SolveState.board.push([] as number[][]);
-    for(let j = 0; j < SolveState.height; j++) {
+    for(let j = 0; j < SolveState.width; j++) {
       if(boardState[i][j].type !== CELL_TYPE.PUZZLE) {
         SolveState.board[i].push([]);
         continue;
