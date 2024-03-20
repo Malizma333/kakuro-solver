@@ -153,7 +153,7 @@ function triggerSolve(props: ToolbarProps) {
 
 const NavButton = (props: ToolbarProps, left: boolean) =>
 <button
-  className={`absolute ${left ? "left" : "right"}-0 border rounded-lg bg-black w-10 disabled:opacity-0`}
+  className={`absolute ${left ? "left-0" : "right-0"} border rounded-lg bg-black w-10 disabled:opacity-0`}
   disabled={props.toolPage === (left ? TOOL_PAGE.SIZE : TOOL_PAGE.HINTS)}
   onClick={() => {
     if(left && props.toolPage === TOOL_PAGE.HINTS) removeHints(props);
