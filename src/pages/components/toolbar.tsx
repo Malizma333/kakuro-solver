@@ -7,7 +7,8 @@ interface ToolbarProps {
   board: BoardType, setBoard: Function,
   toolPage: number, setToolPage: Function,
   swatch: 0 | 1, setSwatch: Function,
-  setInvalidHints: Function
+  setInvalidHints: Function,
+  timeStep: number, setTimeStep: Function
 }
 
 let currentStepFn: any;
@@ -168,7 +169,7 @@ function triggerSolve(props: ToolbarProps) {
 
     if (!done) {
       props.setBoard({...props.board, state: value});
-      currentStepFn = setTimeout(step, 100);
+      currentStepFn = setTimeout(step, props.timeStep);
     }
   }
 
@@ -229,6 +230,7 @@ const HintTools = (props: ToolbarProps) =>
   <button className="border rounded bg-black w-20 h-5 border-neutral-300 flex items-center justify-center"
     onClick={() => triggerSolve(props)}
   >{"Solve"}</button>
+  {TimeSlider(props)}
 </div>
 
 const SolvePageTools = (props: ToolbarProps) =>
@@ -246,6 +248,21 @@ const SolvePageTools = (props: ToolbarProps) =>
       props.setToolPage(2);
     }}
   >{"Back"}</button>
+</div>
+
+const TimeSlider = (props: ToolbarProps) =>
+<div>
+  <label htmlFor="timeSlider" className="ml-4">
+    {"Time Step"}
+  </label>
+  <input
+  id="timeSlider"
+  className="accent-gray-500 m-2 h-2 rounded-lg cursor-pointer"
+  type="range"
+  min={0} max={300} step={1}
+  value={props.timeStep}
+  onChange={(e) => props.setTimeStep(e.target.value)}
+></input>
 </div>
 
 export const ToolbarComponent = ({props}:{props:ToolbarProps}) =>

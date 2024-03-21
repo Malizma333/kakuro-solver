@@ -11,9 +11,20 @@ export default function Home() {
   const [toolPage, setToolPage] = useState(0);
   const [swatch, setSwatch] = useState(0 as 0 | 1);
   const [invalidHints, setInvalidHints] = useState([] as number[]);
+  const [timeStep, setTimeStep] = useState(1);
 
-  const toolbarProps = {board, setBoard, toolPage, setToolPage, swatch, setSwatch, setInvalidHints};
-  const boardProps = {board, setBoard, swatch, toolPage, invalidHints};
+  const toolbarProps = {
+    board, setBoard,
+    toolPage, setToolPage,
+    swatch, setSwatch,
+    setInvalidHints,
+    timeStep, setTimeStep
+  };
+
+  const boardProps = {
+    board, setBoard,
+    swatch, toolPage, invalidHints
+  };
 
   useEffect(() => {(async () => await InitSummation())()}, []);
 
