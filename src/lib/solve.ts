@@ -176,73 +176,6 @@ function PropagateCollisions() {
   }
 }
 
-export function* SolveBoard(boardState: BoardCellType[][]) {
-  DEBUG && console.info("Initializing");
-  let invalidBoard = false;
-  
-  ConstructStates(boardState);
-
-  while(true) {
-    PropagateCollisions();
-    const leastEntropyPairs = GetLeastEntropy();
-    
-    if(leastEntropyPairs.length !== 0) {
-      const choice = leastEntropyPairs[0];
-      const removed = SolveState.board[choice[0]][choice[1]].splice(1);
-      const temp = SolveState.board[choice[0]][choice[1]][0];
-
-      SolveState.board[choice[0]][choice[1]] = [...removed];
-      DEBUG && console.info(`Pushing:\n${StringifyBoard(true)}`);
-      SolveState.stack.push(JSON.stringify([SolveState.board, SolveState.visit]));
-      SolveState.board[choice[0]][choice[1]] = [temp];
-
-      continue;
-    }
-
-    for(let i = 0; i < SolveState.width; i++) {
-      for(let j = 0; j < SolveState.height; j++) {
-        if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-          boardState[i][j].displayData = [SolveState.board[i][j].join(',')];
-        }
-      }
-    }
-
-    yield boardState;
-
-    if(ValidateBoard(boardState)) {
-      break;
-    }
-
-    if(SolveState.stack.length === 0) {
-      invalidBoard = true;
-      break;
-    }
-
-    const rewindState = JSON.parse(SolveState.stack.pop()||"[[] as number[][][], [] as number[]]"); 
-
-    for(let i = 0; i < SolveState.width; i++) {
-      for(let j = 0; j < SolveState.height; j++) {
-        SolveState.board[i][j].length = 0;
-        for(let k = 0; k < rewindState[0][i][j].length; k++) {
-          SolveState.board[i][j].push(rewindState[0][i][j][k]);
-        }
-      }
-    }
-
-    SolveState.visit.length = 0;
-    for(let k = 0; k < rewindState[1].length; k++) {
-      SolveState.visit.push(rewindState[1][k]);
-    }
-
-    DEBUG && console.info(`Rewinding:\n${StringifyBoard(true)}`);
-  }
-
-  DEBUG && console.info(`Final:\n${StringifyBoard(true)}`);
-  DEBUG && console.info(`Success: ${!invalidBoard}`);
-
-  return null;
-}
-
 export function ValidateBoard(boardState: BoardCellType[][]) {
   DEBUG && console.info(`Checking:\n${StringifyBoard(true)}`);
 
@@ -306,4 +239,69 @@ export function ValidateBoard(boardState: BoardCellType[][]) {
   }
 
   return true;
+}
+
+export function* SolveBoard(boardState: BoardCellType[][]) {
+  DEBUG && console.info("Initializing");
+  let invalidBoard = false;
+  
+  ConstructStates(boardState);
+
+  while(true) {
+    PropagateCollisions();
+    const leastEntropyPairs = GetLeastEntropy();
+    
+    if(leastEntropyPairs.length !== 0) {
+      const choice = leastEntropyPairs[0];
+      const removed = SolveState.board[choice[0]][choice[1]].splice(1);
+      const temp = SolveState.board[choice[0]][choice[1]][0];
+
+      SolveState.board[choice[0]][choice[1]] = [...removed];
+      DEBUG && console.info(`Pushing:\n${StringifyBoard(true)}`);
+      SolveState.stack.push(JSON.stringify([SolveState.board, SolveState.visit]));
+      SolveState.board[choice[0]][choice[1]] = [temp];
+
+      continue;
+    }
+
+    for(let i = 0; i < SolveState.width; i++) {
+      for(let j = 0; j < SolveState.height; j++) {
+        if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
+          boardState[i][j].displayData = [SolveState.board[i][j].join(',')];
+        }
+      }
+    }
+
+    yield boardState;
+
+    if(ValidateBoard(boardState)) {
+      break;
+    }
+
+    if(SolveState.stack.length === 0) {
+      invalidBoard = true;
+      break;
+    }
+
+    const rewindState = JSON.parse(SolveState.stack.pop()||"[[] as number[][][], [] as number[]]"); 
+
+    for(let i = 0; i < SolveState.width; i++) {
+      for(let j = 0; j < SolveState.height; j++) {
+        SolveState.board[i][j].length = 0;
+        for(let k = 0; k < rewindState[0][i][j].length; k++) {
+          SolveState.board[i][j].push(rewindState[0][i][j][k]);
+        }
+      }
+    }
+
+    SolveState.visit.length = 0;
+    for(let k = 0; k < rewindState[1].length; k++) {
+      SolveState.visit.push(rewindState[1][k]);
+    }
+
+    DEBUG && console.info(`Rewinding:\n${StringifyBoard(true)}`);
+  }
+
+  DEBUG && console.info(`Final:\n${StringifyBoard(true)}`);
+  DEBUG && console.info(`Success: ${!invalidBoard}`);
 }
