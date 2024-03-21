@@ -10,6 +10,8 @@ interface ToolbarProps {
   setInvalidHints: Function
 }
 
+let currentStepFn: any;
+
 /** Adds hint cells to the board based on the whitespace cells */
 function distributeHints(props: ToolbarProps) {
   const boardState = [...props.board.state];
@@ -158,8 +160,19 @@ function triggerSolve(props: ToolbarProps) {
   if(invalidHints.length > 0) return;
 
   props.setToolPage(-1);
-  const possibleBoards = Array.from(SolveBoard(props.board.state));
-  props.setBoard({...props.board, state: possibleBoards[possibleBoards.length-1]});
+
+  const boardGenerator = SolveBoard(props.board.state);
+
+  function step() {
+    const { value, done } = boardGenerator.next();
+
+    if (!done) {
+      props.setBoard({...props.board, state: value});
+      currentStepFn = setTimeout(step, 100);
+    }
+  }
+
+  step();
 }
 
 const NavButton = (props: ToolbarProps, left: boolean) =>
@@ -222,12 +235,14 @@ const SolvePageTools = (props: ToolbarProps) =>
 <div className="flex justify-center items-center">
   <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
     onClick={() => {
+      clearTimeout(currentStepFn);
       props.setToolPage(0);
       props.setBoard(NewBoard());
     }}
   >{"New Puzzle"}</button>
   <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
     onClick={() => {
+      clearTimeout(currentStepFn);
       props.setToolPage(2);
     }}
   >{"Back"}</button>
