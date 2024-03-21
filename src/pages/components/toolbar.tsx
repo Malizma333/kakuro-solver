@@ -158,7 +158,8 @@ function triggerSolve(props: ToolbarProps) {
   if(invalidHints.length > 0) return;
 
   props.setToolPage(-1);
-  props.setBoard({...props.board, state: SolveBoard(props.board.state)});
+  const possibleBoards = Array.from(SolveBoard(props.board.state));
+  props.setBoard({...props.board, state: possibleBoards[possibleBoards.length-1]});
 }
 
 const NavButton = (props: ToolbarProps, left: boolean) =>
