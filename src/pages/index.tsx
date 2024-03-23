@@ -1,4 +1,4 @@
-import { InitSummation, NewBoard } from "@/lib/board";
+import { NewBoard } from "@/lib/board";
 import { BoardComponent } from "./components/board";
 import { ToolbarComponent } from "./components/toolbar";
 import { useState, useEffect } from "react";
@@ -11,22 +11,22 @@ export default function Home() {
   const [toolPage, setToolPage] = useState(0);
   const [swatch, setSwatch] = useState(0 as 0 | 1);
   const [invalidHints, setInvalidHints] = useState([] as number[]);
-  const [timeStep, setTimeStep] = useState(1);
+  const [speed, setSpeed] = useState(1);
+  const [instant, setInstant] = useState(false);
 
   const toolbarProps = {
     board, setBoard,
     toolPage, setToolPage,
     swatch, setSwatch,
     setInvalidHints,
-    timeStep, setTimeStep
+    speed, setSpeed,
+    instant, setInstant
   };
 
   const boardProps = {
     board, setBoard,
     swatch, toolPage, invalidHints
   };
-
-  useEffect(() => {(async () => await InitSummation())()}, []);
 
   return (
     <main

@@ -8,9 +8,11 @@ interface ToolbarProps {
   toolPage: number, setToolPage: Function,
   swatch: 0 | 1, setSwatch: Function,
   setInvalidHints: Function,
-  timeStep: number, setTimeStep: Function
+  speed: number, setSpeed: Function,
+  instant: boolean, setInstant: Function
 }
 
+const maxSpeed = 300;
 let currentStepFn: any;
 
 /** Adds hint cells to the board based on the whitespace cells */
@@ -162,14 +164,14 @@ function triggerSolve(props: ToolbarProps) {
 
   props.setToolPage(-1);
 
-  const boardGenerator = new BoardSolver(props.board.state).FindSolution();
+  const boardGenerator = new BoardSolver(props.board.state).FindSolution(props.instant);
 
   function step() {
     const { value, done } = boardGenerator.next();
 
     if (!done) {
       props.setBoard({...props.board, state: value});
-      currentStepFn = setTimeout(step, props.timeStep);
+      currentStepFn = setTimeout(step, maxSpeed-props.speed);
     }
   }
 
@@ -251,22 +253,33 @@ const SolvePageTools = (props: ToolbarProps) =>
 </div>
 
 const TimeSlider = (props: ToolbarProps) =>
-<div>
+<div className="flex items-center">
   <label htmlFor="timeSlider" className="ml-4">
-    {"Time Step"}
+    {"Speed"}
   </label>
   <input
   id="timeSlider"
   className="accent-gray-500 m-2 h-2 rounded-lg cursor-pointer"
   type="range"
-  min={0} max={300} step={1}
-  value={props.timeStep}
-  onChange={(e) => props.setTimeStep(e.target.value)}
-></input>
+  disabled={props.instant}
+  min={1} max={maxSpeed} step={1}
+  value={props.speed}
+  onChange={(e) => props.setSpeed(e.target.value)}
+  ></input>
+  <label htmlFor="instantCheck" className="ml-4">
+    {"Instant"}
+  </label>
+  <input
+  id="instantCheck"
+  className="accent-gray-500 m-2 h-6 w-6"
+  type="checkbox"
+  checked={props.instant}
+  onChange={() => props.setInstant(!props.instant)}
+  ></input>
 </div>
 
 export const ToolbarComponent = ({props}:{props:ToolbarProps}) =>
-<div className="relative w-1/2 h-14 flex justify-center items-center">
+<div className="relative w-2/3 h-14 flex justify-center items-center">
   {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, true)}
 
   {props.toolPage === TOOL_PAGE.SIZE && SizeTools(props)}
