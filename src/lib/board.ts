@@ -15,15 +15,6 @@ export interface BoardCellType {
   lengthData: number[];
 };
 
-export let GetSumSet: Function;
-
-export async function InitSummation() {
-  const data = await fetch("sums.json").then(r => r.json());
-  GetSumSet = (size: number, sum: number) => {
-    return data[sum - 3][size - 2];
-  }
-}
-
 export function NewBoard() {
   return {
     width: BOARD_CONSTRAINTS.DEF,

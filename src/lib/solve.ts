@@ -1,307 +1,99 @@
 import { DEBUG } from "./constants";
-import { GetSumSet, CELL_TYPE } from "./board";
+import { CELL_TYPE } from "./board";
 import type { BoardCellType } from "./board";
 
-const BOARD_ERROR = Object.freeze({
-  INVALID_SUM: 0,
-  UNCOLLAPSED_CELL: 1,
-  ZERO_CELL: 2,
-  DUPLICATES: 3
-});
+// Algorithm inspired by https://marcelgarus.dev/kakuro
 
-const SolveState = {
-  width: 0,
-  height: 0,
-  board: [] as number[][][],
-  visit: [] as number[],
-  stack: [] as string[]
-};
+class Constraint {
+  sum: number;
+  targets: number[];
 
-function StringifyBoard(transpose = false) {
-  if(transpose) {
-    const boardT = [] as number[][][];
-
-    for(let j = 0; j < SolveState.height; j++) {
-      boardT.push([] as number[][]);
-      for(let i = 0; i < SolveState.width; i++) {
-        boardT[j][i] = SolveState.board[i][j];
-      }
-    }
-
-    return boardT.map(
-      (e) => e.map(
-        (e2) => JSON.stringify(e2)
-      ).join(' ')
-    ).join('\n')
-  } else {
-    return SolveState.board.map(
-      (e) => e.map(
-        (e2) => JSON.stringify(e2)
-      ).join(' ')
-    ).join('\n')
+  constructor(sum: number, targets: number[]) {
+    this.sum = sum;
+    this.targets = targets;
   }
 }
 
-function ConstructStates(boardState: BoardCellType[][]) {
-  SolveState.width = boardState.length;
-  SolveState.height = boardState[0].length;
-  SolveState.board = [] as number[][][];
-  SolveState.visit = [] as number[];
+class Cell {
+  value: string;
+  possible: number[];
 
-  for(let i = 0; i < SolveState.height; i++) {
-    SolveState.board.push([] as number[][]);
-    for(let j = 0; j < SolveState.width; j++) {
-      if(boardState[i][j].type !== CELL_TYPE.PUZZLE) {
-        SolveState.board[i].push([]);
-        continue;
-      }
-
-      const hintSumColVals = [] as number[];
-      const hintSumRowVals = [] as number[];
-
-      for(let hintCol = j; hintCol >= 0; hintCol--) {
-        if(boardState[i][hintCol].type === CELL_TYPE.NONE) break;
-        if(boardState[i][hintCol].type === CELL_TYPE.HINT) {
-          GetSumSet(
-            boardState[i][hintCol].lengthData[0],
-            parseInt(boardState[i][hintCol].displayData[0])
-          ).forEach((item: number) => hintSumColVals.push(item))
-          break;
-        }
-      }
-      
-      for(let hintRow = i; hintRow >= 0; hintRow--) {
-        if(boardState[hintRow][j].type === CELL_TYPE.NONE) break;
-        if(boardState[hintRow][j].type === CELL_TYPE.HINT) {
-          GetSumSet(
-            boardState[hintRow][j].lengthData[1],
-            parseInt(boardState[hintRow][j].displayData[1])
-          ).forEach((item: number) => hintSumRowVals.push(item))
-          break;
-        }
-      }
-
-      const possibleVals = [] as number[];
-
-      if(hintSumRowVals.length === 0) {
-        hintSumColVals.forEach((i: number) => possibleVals.push(i))
-      } else if(hintSumColVals.length === 0) {
-        hintSumRowVals.forEach((i: number) => possibleVals.push(i))
-      } else {
-        hintSumRowVals.forEach((i: number) => hintSumColVals.includes(i) && possibleVals.push(i))
-      }
-
-      SolveState.board[i].push(possibleVals);
-
-      DEBUG && console.info(`Cell (${i},${j}): ${JSON.stringify(possibleVals)}`);
-    }
+  constructor() {
+    this.value = '-1';
+    this.possible = [1,2,3,4,5,6,7,8,9];
   }
 }
 
-function GetLeastEntropy() {
-  let minEntropy = 9;
-  let pairs = [];
+export class BoardSolver {
+  boardState: BoardCellType[][];
+  constraints: Constraint[];
+  cells: Cell[];
+  cellIndices: number[];
 
-  for(let i = 0; i < SolveState.width; i++) {
-    for(let j = 0; j < SolveState.height; j++) {
-      if(SolveState.board[i][j].length === 0 || SolveState.visit.includes(SolveState.height*i+j)) continue
+  constructor(boardState: BoardCellType[][]) {
+    this.boardState = boardState;
+    this.constraints = [];
+    this.cells = [];
+    this.cellIndices = [];
+  }
 
-      if(SolveState.board[i][j].length < minEntropy) {
-        minEntropy = SolveState.board[i][j].length;
-        pairs.length = 0;
+  Initialize() {
+    DEBUG && console.info("Initializing");
+
+    for(let i = 0; i < this.boardState.length; i++) {
+      for(let j = 0; j < this.boardState[0].length; j++) {
+        if(this.boardState[i][j].type !== CELL_TYPE.PUZZLE) continue;
+        this.cellIndices[i * this.boardState[0].length + j] = this.cells.length;
+        this.cells.push(new Cell());
       }
+    }
 
-      if(SolveState.board[i][j].length === minEntropy) {
-        pairs.push([i,j]);
+    for(let i = 0; i < this.boardState.length; i++) {
+      for(let j = 0; j < this.boardState[0].length; j++) {
+        if(this.boardState[i][j].type !== CELL_TYPE.HINT) continue;
+        
+        if(this.boardState[i][j].displayData[0] !== '') {
+          const targets = [];
+          for(let k = 1; k <= this.boardState[i][j].lengthData[0]; k++) {
+            targets.push(this.cellIndices[i * this.boardState[0].length + k]);
+          }
+          this.constraints.push(
+            new Constraint(parseInt(this.boardState[i][j].displayData[0]), targets)
+          );
+        }
+
+        if(this.boardState[i][j].displayData[1] !== '') {
+          const targets = [];
+          for(let k = 1; k <= this.boardState[i][j].lengthData[1]; k++) {
+            targets.push(this.cellIndices[k * this.boardState[0].length + j]);
+          }
+          this.constraints.push(
+            new Constraint(parseInt(this.boardState[i][j].displayData[1]), targets)
+          );
+        }
       }
     }
   }
 
-  if(pairs.length === 0) minEntropy = 1;
-
-  DEBUG && console.info(`Entropy Pairs (${minEntropy}): ${JSON.stringify(pairs)}`)
-
-  return pairs;
-}
-
-function PropagateCollisions() {
-  const removeArray = [];
-
-  while(true) {
-    for(let i = 0; i < SolveState.width; i++) {
-      for(let j = 0; j < SolveState.height; j++) {
-        if(SolveState.board[i][j].length !== 1 || SolveState.visit.includes(SolveState.height*i+j)) continue;
-        removeArray.push([i, j, SolveState.board[i][j][0]]);
-        SolveState.visit.push(SolveState.height*i+j);
-      }
-    }
-
-    if(removeArray.length === 0) break;
-
-    DEBUG && console.info(`Removing ${JSON.stringify(removeArray)}`);
-
-    for(const v of removeArray) {
-      const toRem = v[2];
-
-      for(let k = v[0] + 1; k < SolveState.width; k++) {
-        if(SolveState.board[k][v[1]].length === 0) break;
-        const vIndex = SolveState.board[k][v[1]].indexOf(toRem);
-        if(vIndex === -1) continue;
-        SolveState.board[k][v[1]].splice(vIndex, 1);
-      }
-
-      for(let k = v[0] - 1; k > 0; k--) {
-        if(SolveState.board[k][v[1]].length === 0) break;
-        const vIndex = SolveState.board[k][v[1]].indexOf(toRem);
-        if(vIndex === -1) continue;
-        SolveState.board[k][v[1]].splice(vIndex, 1);
-      }
-
-      for(let k = v[1] + 1; k < SolveState.height; k++) {
-        if(SolveState.board[v[0]][k].length === 0) break;
-        const vIndex = SolveState.board[v[0]][k].indexOf(toRem);
-        if(vIndex === -1) continue;
-        SolveState.board[v[0]][k].splice(vIndex, 1);
-      }
-
-      for(let k = v[1] - 1; k > 0; k--) {
-        if(SolveState.board[v[0]][k].length === 0) break;
-        const vIndex = SolveState.board[v[0]][k].indexOf(toRem);
-        if(vIndex === -1) continue;
-        SolveState.board[v[0]][k].splice(vIndex, 1);
-      }
-    }
-
-    removeArray.length = 0;
+  Solve() {
+    // Algo here
   }
-}
 
-export function ValidateBoard(boardState: BoardCellType[][]) {
-  DEBUG && console.info(`Checking:\n${StringifyBoard(true)}`);
-
-  let total: number;
-  const visited = [] as number[];
-
-  for(let i = 0; i < SolveState.width; i++) {
-    for(let j = 0; j < SolveState.height; j++) {
-      if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-        if(SolveState.board[i][j].length > 1) {
-          DEBUG && console.info(`Board Error: ${BOARD_ERROR.UNCOLLAPSED_CELL}`);
-          return false;
-        }
-        if(SolveState.board[i][j].length === 0) {
-          DEBUG && console.info(`Board Error: ${BOARD_ERROR.ZERO_CELL}`);
-          return false;
-        }
-        continue;
-      }
-
-      if(boardState[i][j].type !== CELL_TYPE.HINT) continue;
-
-      total = 0;
-      visited.length = 0;
-
-      for(let k = i+1; k <= i+boardState[i][j].lengthData[1]; k++) {
-        total += SolveState.board[k][j][0];
-
-        if(visited.includes(SolveState.board[k][j][0])) {
-          DEBUG && console.info(`Board Error: ${BOARD_ERROR.DUPLICATES}`);
-          return false;
-        }
-
-        visited.push(SolveState.board[k][j][0]);
-      }
-
-      if(boardState[i][j].displayData[1] !== '' && total !== parseInt(boardState[i][j].displayData[1])) {
-        DEBUG && console.info(`Board Error: ${BOARD_ERROR.INVALID_SUM}`);
-        return false;
-      }
-
-      total = 0;
-      visited.length = 0;
-
-      for(let k = j+1; k <= j+boardState[i][j].lengthData[0]; k++) {
-        total += SolveState.board[i][k][0];
-
-        if(visited.includes(SolveState.board[i][k][0])) {
-          DEBUG && console.info(`Board Error: ${BOARD_ERROR.DUPLICATES}`);
-          return false;
-        }
-
-        visited.push(SolveState.board[i][k][0]);
-      }
-
-      if(boardState[i][j].displayData[0] !== '' && total !== parseInt(boardState[i][j].displayData[0])) {
-        DEBUG && console.info(`Board Error: ${BOARD_ERROR.INVALID_SUM}`);
-        return false;
-      }
+  Finalize() {
+    for(const k of Object.keys(this.cellIndices)) {
+      const actualIndex = parseInt(k);
+      const singleIndex = this.cellIndices[actualIndex];
+      const i = Math.floor(actualIndex / this.boardState[0].length);
+      const j = actualIndex % this.boardState[0].length;
+      this.boardState[i][j].displayData[0] = this.cells[singleIndex].value;
     }
   }
 
-  return true;
-}
+  *FindSolution() {
+    this.Initialize();
+    this.Solve();
+    this.Finalize();
 
-export function* SolveBoard(boardState: BoardCellType[][]) {
-  DEBUG && console.info("Initializing");
-  let invalidBoard = false;
-  
-  ConstructStates(boardState);
-
-  while(true) {
-    PropagateCollisions();
-    const leastEntropyPairs = GetLeastEntropy();
-    
-    if(leastEntropyPairs.length !== 0) {
-      const choice = leastEntropyPairs[0];
-      const removed = SolveState.board[choice[0]][choice[1]].splice(1);
-      const temp = SolveState.board[choice[0]][choice[1]][0];
-
-      SolveState.board[choice[0]][choice[1]] = [...removed];
-      DEBUG && console.info(`Pushing:\n${StringifyBoard(true)}`);
-      SolveState.stack.push(JSON.stringify([SolveState.board, SolveState.visit]));
-      SolveState.board[choice[0]][choice[1]] = [temp];
-
-      continue;
-    }
-
-    for(let i = 0; i < SolveState.width; i++) {
-      for(let j = 0; j < SolveState.height; j++) {
-        if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-          boardState[i][j].displayData = [SolveState.board[i][j].join(',')];
-        }
-      }
-    }
-
-    yield boardState;
-
-    if(ValidateBoard(boardState)) {
-      break;
-    }
-
-    if(SolveState.stack.length === 0) {
-      invalidBoard = true;
-      break;
-    }
-
-    const rewindState = JSON.parse(SolveState.stack.pop()||"[[] as number[][][], [] as number[]]"); 
-
-    for(let i = 0; i < SolveState.width; i++) {
-      for(let j = 0; j < SolveState.height; j++) {
-        SolveState.board[i][j].length = 0;
-        for(let k = 0; k < rewindState[0][i][j].length; k++) {
-          SolveState.board[i][j].push(rewindState[0][i][j][k]);
-        }
-      }
-    }
-
-    SolveState.visit.length = 0;
-    for(let k = 0; k < rewindState[1].length; k++) {
-      SolveState.visit.push(rewindState[1][k]);
-    }
-
-    DEBUG && console.info(`Rewinding:\n${StringifyBoard(true)}`);
+    yield this.boardState;
   }
-
-  DEBUG && console.info(`Final:\n${StringifyBoard(true)}`);
-  DEBUG && console.info(`Success: ${!invalidBoard}`);
 }

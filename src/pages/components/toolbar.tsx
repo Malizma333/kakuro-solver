@@ -1,4 +1,4 @@
-import { SolveBoard } from '@/lib/solve';
+import { BoardSolver } from '@/lib/solve';
 import { CELL_TYPE, BOARD_CONSTRAINTS, NewBoard } from "@/lib/board";
 import type { BoardType, BoardCellType, } from "@/lib/board";
 import { TOOL_PAGE } from "@/lib/toolpage";
@@ -162,7 +162,7 @@ function triggerSolve(props: ToolbarProps) {
 
   props.setToolPage(-1);
 
-  const boardGenerator = SolveBoard(props.board.state);
+  const boardGenerator = new BoardSolver(props.board.state).FindSolution();
 
   function step() {
     const { value, done } = boardGenerator.next();
