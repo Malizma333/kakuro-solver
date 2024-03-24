@@ -180,20 +180,20 @@ function triggerSolve(props: ToolbarProps) {
 
 const NavButton = (props: ToolbarProps, left: boolean) =>
 <button
-  className={`absolute ${left ? "left-0" : "right-0"} border rounded-lg bg-black w-10 disabled:opacity-0`}
-  disabled={props.toolPage === (left ? TOOL_PAGE.SIZE : TOOL_PAGE.HINTS)}
+  className={`m-5 border rounded-lg bg-black w-10 disabled:opacity-0`}
+  disabled={props.toolPage === (left ? TOOL_PAGE.SHAPE : TOOL_PAGE.HINTS)}
   onClick={() => {
     if(left && props.toolPage === TOOL_PAGE.HINTS) removeHints(props);
-    if(!left && props.toolPage === TOOL_PAGE.COLOR) distributeHints(props);
+    if(!left && props.toolPage === TOOL_PAGE.SHAPE) distributeHints(props);
     props.setToolPage(props.toolPage + (left ? -1 : 1));
   }}
 >
   {left ? "<" : ">"}
 </button>
 
-const SizeTools = (props: ToolbarProps) =>
+const ShapeTools = (props: ToolbarProps) =>
 <div className="flex justify-center items-center">
-  <label className="mr-3 ml-6" htmlFor="width">Width</label>
+  <label className="m-3" htmlFor="width">Width</label>
   <input className="border rounded-lg bg-black w-10"
     id="width"
     type="number"
@@ -203,7 +203,7 @@ const SizeTools = (props: ToolbarProps) =>
     value={props.board.width}
     onChange={(e) => setWidth(props, e.target.value)}
   />
-  <label className="mr-3 ml-6" htmlFor="height">Height</label>
+  <label className="m-3" htmlFor="height">Height</label>
   <input className="border rounded-lg bg-black w-10"
     id="height"
     type="number"
@@ -213,15 +213,13 @@ const SizeTools = (props: ToolbarProps) =>
     value={props.board.height}
     onChange={(e) => setHeight(props, e.target.value)}
   />
-</div>
-
-const ColorTools = (props: ToolbarProps) =>
-<div className="flex justify-center items-center">
-  <button className="border rounded-l-lg bg-black w-10 h-5 border-red-500 disabled:border-2 hover:enabled:border-red-700"
+  <span className="w-4"/>
+  <button className="aspect-square rounded-full bg-black w-6 disabled:w-7 border border-white"
     disabled={props.swatch === 0}
     onClick={() => props.setSwatch(0)}
   />
-  <button className="border rounded-r-lg bg-white w-10 h-5 border-red-500 disabled:border-2 hover:enabled:border-red-700"
+  <span className="w-4"/>
+  <button className="aspect-square rounded-full bg-white w-6 disabled:w-7"
     disabled={props.swatch === 1}
     onClick={() => props.setSwatch(1)}
   />
@@ -247,7 +245,7 @@ const SolvePageTools = (props: ToolbarProps) =>
   <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
     onClick={() => {
       clearTimeout(currentStepFn);
-      props.setToolPage(2);
+      props.setToolPage(TOOL_PAGE.HINTS);
     }}
   >{"Back"}</button>
 </div>
@@ -279,11 +277,10 @@ const TimeSlider = (props: ToolbarProps) =>
 </div>
 
 export const ToolbarComponent = ({props}:{props:ToolbarProps}) =>
-<div className="relative w-2/3 h-14 flex justify-center items-center">
+<div className="border border-red-500 absolute top-0 w-full flex justify-center items-center">
   {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, true)}
 
-  {props.toolPage === TOOL_PAGE.SIZE && SizeTools(props)}
-  {props.toolPage === TOOL_PAGE.COLOR && ColorTools(props)}
+  {props.toolPage === TOOL_PAGE.SHAPE && ShapeTools(props)}
   {props.toolPage === TOOL_PAGE.HINTS && HintTools(props)}
   {props.toolPage === TOOL_PAGE.HIDDEN && SolvePageTools(props)}
 

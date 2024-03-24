@@ -31,16 +31,7 @@ function setHint(props: BoardProps, i: number, j: number, k: number, inputValue:
   props.setBoard({...props.board, state: boardState} as BoardType)
 }
 
-const SizeBoard = (props: BoardProps) =>
-[...Array(props.board.height)].map((_,j) =>
-  <div key={j} className="flex flex-row">
-    {[...Array(props.board.width)].map((_,i) =>
-      <div className={`border ${cellD} bg-black`} key={i}/>
-    )}
-  </div>
-)
-
-const ColorBoard = (props: BoardProps) => 
+const ShapeBoard = (props: BoardProps) => 
 [...Array(props.board.height)].map((_,j) =>
   <div key={j} className="flex flex-row">
     {[...Array(props.board.width)].map((_,i) =>
@@ -136,8 +127,7 @@ const FilledBoard = (props: BoardProps) =>
   
 export const BoardComponent = ({props}:{props: BoardProps}) =>
 <div className="h-full w-full flex-1 m-5 flex flex-col justify-center items-center">
-  {props.toolPage === TOOL_PAGE.SIZE && SizeBoard(props)}
-  {props.toolPage === TOOL_PAGE.COLOR && ColorBoard(props)}
+  {props.toolPage === TOOL_PAGE.SHAPE && ShapeBoard(props)}
   {props.toolPage === TOOL_PAGE.HINTS && TextBoard(props)}
   {props.toolPage === TOOL_PAGE.HIDDEN && FilledBoard(props)}
 </div>

@@ -1,4 +1,4 @@
-const BOARD_CONSTRAINTS = Object.freeze({ MIN: 5, MAX: 20, DEF: 10 });
+const BOARD_CONSTRAINTS = Object.freeze({ MIN: 3, MAX: 20, DEF: 10 });
 const CELL_TYPE = Object.freeze({ NONE: 0, PUZZLE: 1, HINT: 2 });
 const HINT_CONSTRAINTS = Object.freeze({ MIN: 3, MAX: 45 });
 export {BOARD_CONSTRAINTS, CELL_TYPE, HINT_CONSTRAINTS};
