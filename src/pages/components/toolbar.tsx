@@ -277,7 +277,7 @@ const TimeSlider = (props: ToolbarProps) =>
 </div>
 
 export const ToolbarComponent = ({props}:{props:ToolbarProps}) =>
-<div className="border border-red-500 absolute top-0 w-full flex justify-center items-center">
+<div className="absolute top-0 w-full flex justify-center items-center">
   {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, true)}
 
   {props.toolPage === TOOL_PAGE.SHAPE && ShapeTools(props)}
