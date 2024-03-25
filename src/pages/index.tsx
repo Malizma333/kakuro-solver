@@ -14,6 +14,7 @@ export default function Home() {
   const [invalidHints, setInvalidHints] = useState([] as number[]);
   const [speed, setSpeed] = useState(1);
   const [instant, setInstant] = useState(false);
+  const [error, setError] = useState(false);
 
   const toolbarProps = {
     board, setBoard,
@@ -21,7 +22,8 @@ export default function Home() {
     swatch, setSwatch,
     setInvalidHints,
     speed, setSpeed,
-    instant, setInstant
+    instant, setInstant,
+    error, setError
   };
 
   const boardProps = {

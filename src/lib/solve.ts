@@ -177,13 +177,13 @@ export class BoardSolver {
     let currentTime = performance.now();
     let startTime = currentTime;
     let curIndex = 0;
-    let impossible = false;
+    let success = true;
 
     while(curIndex < this.cells.length) {
       if(!instant) {
-        yield this.boardState;
+        yield {success, state: this.boardState};
       } else if(performance.now() - currentTime > 10) {
-        yield this.boardState;
+        yield {success, state: this.boardState};
         currentTime = performance.now();
       }
 
@@ -200,14 +200,13 @@ export class BoardSolver {
       } else {
         this.cells[0].reset();
         this.UpdateCell(0);
-        impossible = true;
+        success = false;
         break;
       }
     }
 
-    DEBUG && console.info(`Succeeded: ${!impossible}`);
     DEBUG && console.info(`Time Taken: ${performance.now() - startTime} ms`)
 
-    yield this.boardState;
+    yield {success, state: this.boardState};
   }
 }

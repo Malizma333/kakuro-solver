@@ -9,7 +9,8 @@ interface ToolbarProps {
   swatch: 0 | 1, setSwatch: Function,
   setInvalidHints: Function,
   speed: number, setSpeed: Function,
-  instant: boolean, setInstant: Function
+  instant: boolean, setInstant: Function,
+  error: boolean, setError: Function
 }
 
 const maxSpeed = 300;
@@ -170,7 +171,8 @@ function triggerSolve(props: ToolbarProps) {
     const { value, done } = boardGenerator.next();
 
     if (!done) {
-      props.setBoard({...props.board, state: value});
+      if(!value.success) props.setError(true);
+      props.setBoard({...props.board, state: value.state});
       currentStepFn = setTimeout(step, maxSpeed-props.speed);
     }
   }
@@ -250,8 +252,9 @@ const SolvePageTools = (props: ToolbarProps) =>
   <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
     onClick={() => {
       clearTimeout(currentStepFn);
-      props.setToolPage(0);
+      props.setToolPage(TOOL_PAGE.SHAPE);
       props.setBoard(NewBoard());
+      props.setError(false);
     }}
   >{"New Puzzle"}</button>
   <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
@@ -259,6 +262,7 @@ const SolvePageTools = (props: ToolbarProps) =>
       clearTimeout(currentStepFn);
       props.setToolPage(TOOL_PAGE.HINTS);
       props.setBoard({...props.board, state: removeDisplay(props.board.state)})
+      props.setError(false);
     }}
   >{"Back"}</button>
 </div>
@@ -289,13 +293,21 @@ const TimeSlider = (props: ToolbarProps) =>
   ></input>
 </div>
 
+const ErrorMessageComponent = () =>
+<div className="text-red-500">
+  {"Solution Not Found"}
+</div>
+
 export const ToolbarComponent = ({props}:{props:ToolbarProps}) =>
-<div className="absolute top-0 w-full flex justify-center items-center">
-  {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, true)}
+<div className="absolute top-0 w-full flex flex-col justify-center items-center">
+  <div className="flex justify-center items-center">
+    {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, true)}
 
-  {props.toolPage === TOOL_PAGE.SHAPE && ShapeTools(props)}
-  {props.toolPage === TOOL_PAGE.HINTS && HintTools(props)}
-  {props.toolPage === TOOL_PAGE.HIDDEN && SolvePageTools(props)}
+    {props.toolPage === TOOL_PAGE.SHAPE && ShapeTools(props)}
+    {props.toolPage === TOOL_PAGE.HINTS && HintTools(props)}
+    {props.toolPage === TOOL_PAGE.HIDDEN && SolvePageTools(props)}
 
-  {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, false)}
+    {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, false)}
+  </div>
+  {props.toolPage === TOOL_PAGE.HIDDEN && props.error && ErrorMessageComponent()}
 </div>
