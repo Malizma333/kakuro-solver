@@ -3,6 +3,7 @@ import { BoardComponent } from "./components/board";
 import { ToolbarComponent } from "./components/toolbar";
 import { useState, useEffect } from "react";
 import { Inter } from "next/font/google";
+import { InitSummation } from "@/lib/solve";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,8 @@ export default function Home() {
     board, setBoard,
     swatch, toolPage, invalidHints
   };
+
+  useEffect(() => {(async () => await InitSummation())()}, []);
 
   return (
     <main
