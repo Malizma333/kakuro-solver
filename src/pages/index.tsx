@@ -1,6 +1,6 @@
 import { getNewBoard, getExampleBoard } from "@/lib/board";
-import { BoardComponent } from "./components/board";
-import { ToolbarComponent } from "./components/toolbar";
+import BoardComponent from "./components/board";
+import ToolbarComponent from "./components/toolbar";
 import { useState, useEffect } from "react";
 import { Inter } from "next/font/google";
 import { InitSummation } from "@/lib/solve";

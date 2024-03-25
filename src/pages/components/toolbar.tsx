@@ -95,126 +95,135 @@ function triggerSolve(props: ToolbarProps) {
   step();
 }
 
-const NavButton = (props: ToolbarProps, left: boolean) =>
-<button
-  className={`m-5 border rounded-lg bg-black w-10 disabled:opacity-0`}
-  disabled={props.toolPage === (left ? TOOL_PAGE.SHAPE : TOOL_PAGE.HINTS)}
-  onClick={() => {
-    if(left && props.toolPage === TOOL_PAGE.HINTS) {
-      props.setBoard({...props.board, state: removeHints(props.board.state)});
-    }
-    if(!left && props.toolPage === TOOL_PAGE.SHAPE) {
-      props.setBoard({...props.board, state: distributeHints(props.board.state)});
-    }
-    props.setToolPage(props.toolPage + (left ? -1 : 1));
-  }}
->
-  {left ? "<" : ">"}
-</button>
-
-const ShapeTools = (props: ToolbarProps) =>
-<div className="flex justify-center items-center">
-  <label className="m-3" htmlFor="width">Width</label>
-  <input className="border rounded-lg bg-black w-10"
-    id="width"
-    type="number"
-    min={BOARD_CONSTRAINTS.MIN}
-    max={BOARD_CONSTRAINTS.MAX}
-    placeholder={BOARD_CONSTRAINTS.DEF.toString()}
-    value={props.board.width}
-    onChange={(e) => setWidth(props, e.target.value)}
-  />
-  <label className="m-3" htmlFor="height">Height</label>
-  <input className="border rounded-lg bg-black w-10"
-    id="height"
-    type="number"
-    min={BOARD_CONSTRAINTS.MIN}
-    max={BOARD_CONSTRAINTS.MAX}
-    placeholder={BOARD_CONSTRAINTS.DEF.toString()}
-    value={props.board.height}
-    onChange={(e) => setHeight(props, e.target.value)}
-  />
-  <span className="w-4"/>
-  <button className="aspect-square rounded-full bg-black w-6 disabled:w-7 border border-white"
-    disabled={props.swatch === 0}
-    onClick={() => props.setSwatch(0)}
-  />
-  <span className="w-4"/>
-  <button className="aspect-square rounded-full bg-white w-6 disabled:w-7"
-    disabled={props.swatch === 1}
-    onClick={() => props.setSwatch(1)}
-  />
-</div>
-
-const HintTools = (props: ToolbarProps) =>
-<div className="flex justify-center items-center">
-  <button className="border rounded bg-black w-20 h-5 border-neutral-300 flex items-center justify-center"
-    onClick={() => triggerSolve(props)}
-  >{"Solve"}</button>
-  {TimeSlider(props)}
-</div>
-
-const SolvePageTools = (props: ToolbarProps) =>
-<div className="flex justify-center items-center">
-  <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
+function NavButton(props: ToolbarProps, left: boolean) {
+  return <button
+    className={`m-5 border rounded-lg bg-black w-10 disabled:opacity-0`}
+    disabled={props.toolPage === (left ? TOOL_PAGE.SHAPE : TOOL_PAGE.HINTS)}
     onClick={() => {
-      props.setToolPage(TOOL_PAGE.SHAPE);
-      props.setBoard(getNewBoard());
-      clearTimeout(currentStepFn);
-      props.setError(false);
+      if(left && props.toolPage === TOOL_PAGE.HINTS) {
+        props.setBoard({...props.board, state: removeHints(props.board.state)});
+      }
+      if(!left && props.toolPage === TOOL_PAGE.SHAPE) {
+        props.setBoard({...props.board, state: distributeHints(props.board.state)});
+      }
+      props.setToolPage(props.toolPage + (left ? -1 : 1));
     }}
-  >{"New Puzzle"}</button>
-  <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
-    onClick={() => {
-      props.setToolPage(TOOL_PAGE.HINTS);
-      props.setBoard({...props.board, state: removeDisplay(props.board.state)});
-      clearTimeout(currentStepFn);
-      props.setError(false);
-    }}
-  >{"Back"}</button>
-</div>
+  >
+    {left ? "<" : ">"}
+  </button>
+}
 
-const TimeSlider = (props: ToolbarProps) =>
-<div className="flex items-center">
-  <label htmlFor="timeSlider" className="ml-4">
-    {"Speed"}
-  </label>
-  <input
-  id="timeSlider"
-  className="accent-gray-500 m-2 h-2 rounded-lg cursor-pointer"
-  type="range"
-  disabled={props.instant}
-  min={1} max={maxSpeed} step={1}
-  value={props.speed}
-  onChange={(e) => props.setSpeed(e.target.value)}
-  ></input>
-  <label htmlFor="instantCheck" className="ml-4">
-    {"Instant"}
-  </label>
-  <input
-  id="instantCheck"
-  className="accent-gray-500 m-2 h-6 w-6"
-  type="checkbox"
-  checked={props.instant}
-  onChange={() => props.setInstant(!props.instant)}
-  ></input>
-</div>
-
-const ErrorMessageComponent = () =>
-<div className="text-red-500">
-  {"Solution Not Found"}
-</div>
-
-export const ToolbarComponent = ({props}:{props:ToolbarProps}) =>
-<div className="absolute top-0 w-full flex flex-col justify-center items-center">
-  <div className="flex justify-center items-center">
-    {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, true)}
-
-    {props.toolPage === TOOL_PAGE.SHAPE && ShapeTools(props)}
-    {props.toolPage === TOOL_PAGE.HINTS && HintTools(props)}
-    {props.toolPage === TOOL_PAGE.HIDDEN && SolvePageTools(props)}
-
-    {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, false)}
+function ShapeTools(props: ToolbarProps) {
+  return <div className="flex justify-center items-center">
+    <label className="m-3" htmlFor="width">Width</label>
+    <input className="border rounded-lg bg-black w-10"
+      id="width"
+      type="number"
+      min={BOARD_CONSTRAINTS.MIN}
+      max={BOARD_CONSTRAINTS.MAX}
+      placeholder={BOARD_CONSTRAINTS.DEF.toString()}
+      value={props.board.width}
+      onChange={(e) => setWidth(props, e.target.value)}
+    />
+    <label className="m-3" htmlFor="height">Height</label>
+    <input className="border rounded-lg bg-black w-10"
+      id="height"
+      type="number"
+      min={BOARD_CONSTRAINTS.MIN}
+      max={BOARD_CONSTRAINTS.MAX}
+      placeholder={BOARD_CONSTRAINTS.DEF.toString()}
+      value={props.board.height}
+      onChange={(e) => setHeight(props, e.target.value)}
+    />
+    <span className="w-4"/>
+    <button className="aspect-square rounded-full bg-black w-6 disabled:w-7 border border-white"
+      disabled={props.swatch === 0}
+      onClick={() => props.setSwatch(0)}
+    />
+    <span className="w-4"/>
+    <button className="aspect-square rounded-full bg-white w-6 disabled:w-7"
+      disabled={props.swatch === 1}
+      onClick={() => props.setSwatch(1)}
+    />
   </div>
-  {props.toolPage === TOOL_PAGE.HIDDEN && props.error && ErrorMessageComponent()}
-</div>
+}
+
+function HintTools(props: ToolbarProps) {
+  return <div className="flex justify-center items-center">
+    <button className="border rounded bg-black w-20 h-5 border-neutral-300 flex items-center justify-center"
+      onClick={() => triggerSolve(props)}
+    >{"Solve"}</button>
+    {TimeSlider(props)}
+  </div>
+}
+
+function SolvePageTools(props: ToolbarProps) {
+  return <div className="flex justify-center items-center">
+    <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
+      onClick={() => {
+        props.setToolPage(TOOL_PAGE.SHAPE);
+        props.setBoard(getNewBoard());
+        clearTimeout(currentStepFn);
+        props.setError(false);
+      }}
+    >{"New Puzzle"}</button>
+    <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
+      onClick={() => {
+        props.setToolPage(TOOL_PAGE.HINTS);
+        props.setBoard({...props.board, state: removeDisplay(props.board.state)});
+        clearTimeout(currentStepFn);
+        props.setError(false);
+      }}
+    >{"Back"}</button>
+  </div>
+}
+
+function TimeSlider(props: ToolbarProps) {
+  return <div className="flex items-center">
+    <label htmlFor="timeSlider" className="ml-4">
+      {"Speed"}
+    </label>
+    <input
+    id="timeSlider"
+    className="accent-gray-500 m-2 h-2 rounded-lg cursor-pointer"
+    type="range"
+    disabled={props.instant}
+    min={1} max={maxSpeed} step={1}
+    value={props.speed}
+    onChange={(e) => props.setSpeed(e.target.value)}
+    ></input>
+    <label htmlFor="instantCheck" className="ml-4">
+      {"Instant"}
+    </label>
+    <input
+    id="instantCheck"
+    className="accent-gray-500 m-2 h-6 w-6"
+    type="checkbox"
+    checked={props.instant}
+    onChange={() => props.setInstant(!props.instant)}
+    ></input>
+  </div>
+}
+
+function ErrorMessageComponent() {
+  return <div className="text-red-500 font-bold">
+    {"Solution Not Found"}
+  </div>
+}
+
+export default function ToolbarComponent({props}:{props:ToolbarProps}) {
+  if(!props) return;
+
+  return <div className="absolute top-0 w-full flex flex-col justify-center items-center">
+    <div className="flex justify-center items-center">
+      {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, true)}
+
+      {props.toolPage === TOOL_PAGE.SHAPE && ShapeTools(props)}
+      {props.toolPage === TOOL_PAGE.HINTS && HintTools(props)}
+      {props.toolPage === TOOL_PAGE.HIDDEN && SolvePageTools(props)}
+
+      {props.toolPage !== TOOL_PAGE.HIDDEN && NavButton(props, false)}
+    </div>
+    {props.toolPage === TOOL_PAGE.HIDDEN && props.error && ErrorMessageComponent()}
+  </div>
+}
