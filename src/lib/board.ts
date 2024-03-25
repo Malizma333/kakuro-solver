@@ -15,7 +15,8 @@ export interface BoardCellType {
   lengthData: number[];
 };
 
-export function NewBoard() {
+/** Initializes a new board object */
+export function getNewBoard() {
   return {
     width: BOARD_CONSTRAINTS.DEF,
     height: BOARD_CONSTRAINTS.DEF,
@@ -25,4 +26,111 @@ export function NewBoard() {
       )
     )
   }
+}
+
+/** Removes all display values from puzzle cells */
+export function removeDisplay(boardState: BoardCellType[][]) {
+  for(let i = 0; i < boardState.length; i++ ) {
+    for(let j = 0; j < boardState[0].length; j++) {
+      if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
+        boardState[i][j].displayData[0] = '';
+      }
+    }
+  }
+  
+  return boardState;
+}
+
+/** Adds hint cells to the board based on the whitespace cells */
+export function distributeHints(boardState: BoardCellType[][]) {
+
+  // Rows
+  for(let i = 0; i < boardState.length; i++) {
+    let lastNone = -1;
+    let chain = 0;
+    for(let j = 0; j < boardState[0].length; j++) {
+      if(boardState[i][j].type === CELL_TYPE.NONE) {
+        if(chain < 2) {
+          lastNone = j;
+          chain = 0;
+          continue;
+        }
+
+        if(lastNone > -1) {
+          boardState[i][lastNone].type = CELL_TYPE.HINT;
+          boardState[i][lastNone].displayData = ['',''];
+          boardState[i][lastNone].lengthData[0] = j-lastNone-1;
+        }
+
+        lastNone = j;
+        chain = 0;
+      } else if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
+        chain += 1;
+      }
+    }
+
+    if(chain < 2) {
+      continue;
+    }
+
+    // End of row
+    if(lastNone > -1) {
+      boardState[i][lastNone].type = CELL_TYPE.HINT;
+      boardState[i][lastNone].displayData = ['',''];
+      boardState[i][lastNone].lengthData[0] = boardState[i].length-lastNone-1;
+    }
+  }
+
+  // Columns
+  for(let j = 0; j < boardState[0].length; j++) {
+    let lastNone = -1;
+    let chain = 0;
+    for(let i = 0; i < boardState.length; i++) {
+      if(boardState[i][j].type === CELL_TYPE.NONE || boardState[i][j].type === CELL_TYPE.HINT) {
+        if(chain < 2) {
+          lastNone = i;
+          chain = 0;
+          continue;
+        }
+
+        if(lastNone > -1) {
+          boardState[lastNone][j].type = CELL_TYPE.HINT;
+          boardState[lastNone][j].displayData = ['',''];
+          boardState[lastNone][j].lengthData[1] = i-lastNone-1;
+        }
+
+        lastNone = i;
+        chain = 0;
+      } else if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
+        chain += 1;
+      }
+    }
+
+    if(chain < 2) {
+      continue;
+    }
+
+    // End of column
+    if(lastNone > -1) {
+      boardState[lastNone][j].type = CELL_TYPE.HINT;
+      boardState[lastNone][j].displayData = ['',''];
+      boardState[lastNone][j].lengthData[1] = boardState.length-lastNone-1;
+    }
+  }
+
+  return boardState;
+}
+
+/** Removes the hint cells from the board state */
+export function removeHints(boardState: BoardCellType[][]) {
+  for(let i = 0; i < boardState.length; i++) {
+    for(let j = 0; j < boardState[0].length; j++) {
+      if(boardState[i][j].type === CELL_TYPE.PUZZLE) continue
+      boardState[i][j].type = CELL_TYPE.NONE;
+      boardState[i][j].displayData = [];
+      boardState[i][j].lengthData = [-1,-1];
+    }
+  }
+
+  return boardState;
 }

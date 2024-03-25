@@ -1,5 +1,6 @@
 import { BoardSolver } from '@/lib/solve';
-import { CELL_TYPE, BOARD_CONSTRAINTS, NewBoard } from "@/lib/board";
+import { CELL_TYPE, BOARD_CONSTRAINTS } from "@/lib/board";
+import { getNewBoard, removeDisplay, distributeHints, removeHints } from "@/lib/board";
 import type { BoardType, BoardCellType, } from "@/lib/board";
 import { TOOL_PAGE } from "@/lib/toolpage";
 
@@ -15,99 +16,6 @@ interface ToolbarProps {
 
 const maxSpeed = 300;
 let currentStepFn: any;
-
-/** Adds hint cells to the board based on the whitespace cells */
-function distributeHints(props: ToolbarProps) {
-  const boardState = [...props.board.state];
-
-  for(let i = 0; i < props.board.width; i++) {
-    let lastNone = -1;
-    let chain = 0;
-    for(let j = 0; j < props.board.height; j++) {
-      if(boardState[i][j].type === CELL_TYPE.NONE) {
-        if(chain < 2) {
-          lastNone = j;
-          chain = 0;
-          continue;
-        }
-
-        if(lastNone > -1) {
-          boardState[i][lastNone].type = CELL_TYPE.HINT;
-          boardState[i][lastNone].displayData = ['',''];
-          boardState[i][lastNone].lengthData[0] = j-lastNone-1;
-        }
-
-        lastNone = j;
-        chain = 0;
-      } else if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-        chain += 1;
-      }
-    }
-
-    if(chain < 2) {
-      continue;
-    }
-
-    if(lastNone > -1) {
-      boardState[i][lastNone].type = CELL_TYPE.HINT;
-      boardState[i][lastNone].displayData = ['',''];
-      boardState[i][lastNone].lengthData[0] = boardState[i].length-lastNone-1;
-    }
-  }
-
-  for(let j = 0; j < props.board.height; j++) {
-    let lastNone = -1;
-    let chain = 0;
-    for(let i = 0; i < props.board.width; i++) {
-      if(boardState[i][j].type === CELL_TYPE.NONE || boardState[i][j].type === CELL_TYPE.HINT) {
-        if(chain < 2) {
-          lastNone = i;
-          chain = 0;
-          continue;
-        }
-
-        if(lastNone > -1) {
-          boardState[lastNone][j].type = CELL_TYPE.HINT;
-          boardState[lastNone][j].displayData = ['',''];
-          boardState[lastNone][j].lengthData[1] = i-lastNone-1;
-        }
-
-        lastNone = i;
-        chain = 0;
-      } else if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-        chain += 1;
-      }
-    }
-
-    if(chain < 2) {
-      continue;
-    }
-
-    if(lastNone > -1) {
-      boardState[lastNone][j].type = CELL_TYPE.HINT;
-      boardState[lastNone][j].displayData = ['',''];
-      boardState[lastNone][j].lengthData[1] = boardState.length-lastNone-1;
-    }
-  }
-  
-  props.setBoard({...props.board, state: boardState})
-}
-
-/** Removes the hint cells from the board state */
-function removeHints(props: ToolbarProps) {
-  const boardState = [...props.board.state];
-
-  for(let i = 0; i < props.board.width; i++) {
-    for(let j = 0; j < props.board.height; j++) {
-      if(boardState[i][j].type === CELL_TYPE.PUZZLE) continue
-      boardState[i][j].type = CELL_TYPE.NONE;
-      boardState[i][j].displayData = [];
-      boardState[i][j].lengthData = [-1,-1];
-    }
-  }
-
-  props.setBoard({...props.board, state: boardState})
-}
 
 /** Sets the width of the board by adding or removing the last array */
 function setWidth(props: ToolbarProps, inputValue: string) {
@@ -146,9 +54,10 @@ function setHeight(props: ToolbarProps, inputValue: string) {
   props.setBoard({...props.board, state: boardState, height: newHeight});
 }
 
-/** Triggers a board solve state after checking if the board is valid */
-function triggerSolve(props: ToolbarProps) {
+/** Validates that all board inputs are filled */
+function validateBoard(props: ToolbarProps) {
   const invalidHints = [] as number[];
+  
   for(let i = 0; i < props.board.width; i++ ) {
     for(let j = 0; j < props.board.height; j++) {
       const currentCell = props.board.state[i][j];
@@ -159,9 +68,15 @@ function triggerSolve(props: ToolbarProps) {
       }
     }
   }
+
   props.setInvalidHints(invalidHints);
 
-  if(invalidHints.length > 0) return;
+  return invalidHints.length === 0;
+}
+
+/** Triggers a board solve state */
+function triggerSolve(props: ToolbarProps) {
+  if(!validateBoard(props)) return;
 
   props.setToolPage(-1);
 
@@ -180,25 +95,17 @@ function triggerSolve(props: ToolbarProps) {
   step();
 }
 
-/** Removes all display values from puzzle cells */
-function removeDisplay(boardState: BoardCellType[][]) {
-  for(let i = 0; i < boardState.length; i++ ) {
-    for(let j = 0; j < boardState[0].length; j++) {
-      if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
-        boardState[i][j].displayData[0] = '';
-      }
-    }
-  }
-  return boardState;
-}
-
 const NavButton = (props: ToolbarProps, left: boolean) =>
 <button
   className={`m-5 border rounded-lg bg-black w-10 disabled:opacity-0`}
   disabled={props.toolPage === (left ? TOOL_PAGE.SHAPE : TOOL_PAGE.HINTS)}
   onClick={() => {
-    if(left && props.toolPage === TOOL_PAGE.HINTS) removeHints(props);
-    if(!left && props.toolPage === TOOL_PAGE.SHAPE) distributeHints(props);
+    if(left && props.toolPage === TOOL_PAGE.HINTS) {
+      props.setBoard({...props.board, state: removeHints(props.board.state)});
+    }
+    if(!left && props.toolPage === TOOL_PAGE.SHAPE) {
+      props.setBoard({...props.board, state: distributeHints(props.board.state)});
+    }
     props.setToolPage(props.toolPage + (left ? -1 : 1));
   }}
 >
@@ -251,17 +158,17 @@ const SolvePageTools = (props: ToolbarProps) =>
 <div className="flex justify-center items-center">
   <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
     onClick={() => {
-      clearTimeout(currentStepFn);
       props.setToolPage(TOOL_PAGE.SHAPE);
-      props.setBoard(NewBoard());
+      props.setBoard(getNewBoard());
+      clearTimeout(currentStepFn);
       props.setError(false);
     }}
   >{"New Puzzle"}</button>
   <button className="border rounded bg-black w-28 h-7 m-2 border-neutral-300 flex items-center justify-center"
     onClick={() => {
-      clearTimeout(currentStepFn);
       props.setToolPage(TOOL_PAGE.HINTS);
-      props.setBoard({...props.board, state: removeDisplay(props.board.state)})
+      props.setBoard({...props.board, state: removeDisplay(props.board.state)});
+      clearTimeout(currentStepFn);
       props.setError(false);
     }}
   >{"Back"}</button>
