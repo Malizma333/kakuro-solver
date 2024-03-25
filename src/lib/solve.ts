@@ -16,11 +16,18 @@ class Constraint {
 
 class Cell {
   value: number;
-  possible: number[];
+  options: number[];
+  constraints: number[];
 
   constructor() {
     this.value = -1;
-    this.possible = [1,2,3,4,5,6,7,8,9];
+    this.options = [1,2,3,4,5,6,7,8,9];
+    this.constraints = [-1,-1];
+  }
+
+  reset() {
+    this.options = [1,2,3,4,5,6,7,8,9];
+    this.value = -1;
   }
 }
 
@@ -55,7 +62,10 @@ export class BoardSolver {
         if(this.boardState[i][j].displayData[0] !== '') {
           const targets = [];
           for(let k = 0; k < this.boardState[i][j].lengthData[0]; k++) {
-            targets.push(this.cellIndices.indexOf(i * this.boardState[0].length + (k + j + 1)));
+            const arrayIndex = i * this.boardState[0].length + (k + j + 1);
+            const singleIndex = this.cellIndices.indexOf(arrayIndex);
+            targets.push(singleIndex);
+            this.cells[singleIndex].constraints[0] = this.constraints.length;
           }
           this.constraints.push(
             new Constraint(parseInt(this.boardState[i][j].displayData[0]), targets)
@@ -65,7 +75,10 @@ export class BoardSolver {
         if(this.boardState[i][j].displayData[1] !== '') {
           const targets = [];
           for(let k = 0; k < this.boardState[i][j].lengthData[1]; k++) {
-            targets.push(this.cellIndices.indexOf((k + i + 1) * this.boardState[0].length + j));
+            const arrayIndex = (k + i + 1) * this.boardState[0].length + j;
+            const singleIndex = this.cellIndices.indexOf(arrayIndex);
+            targets.push(singleIndex);
+            this.cells[singleIndex].constraints[1] = this.constraints.length;
           }
           this.constraints.push(
             new Constraint(parseInt(this.boardState[i][j].displayData[1]), targets)
@@ -75,23 +88,28 @@ export class BoardSolver {
     }
   }
 
-  ValidateConstraint(constraintIndex: number) {
-    const targetConstraint = this.constraints[constraintIndex];
-    const duplicates = Array(10).fill(false);
-    let total = 0;
-    for(const i of targetConstraint.targets) {
-      if(duplicates[this.cells[i].value]) return false;
-      duplicates[this.cells[i].value] = true;
-      total += this.cells[i].value;
-    }
-    return total === targetConstraint.sum;
-  }
+  ValidateCell(cellIndex: number) {
+    if(this.cells[cellIndex].value === -1) return false;
 
-  ValidateBoard() {
-    for(let i = 0; i < this.constraints.length; i++) {
-      if(!this.ValidateConstraint(i)) {
-        return false;
+    for(const constraintIndex of this.cells[cellIndex].constraints) {
+      if(constraintIndex === -1) continue;
+
+      const targetConstraint = this.constraints[constraintIndex];
+      const duplicates = Array(10).fill(false);
+      let unfilled = false;
+      let total = 0;
+
+      for(const i of targetConstraint.targets) {
+        if(this.cells[i].value === -1) {
+          unfilled = true;
+          break;
+        }
+        if(duplicates[this.cells[i].value]) return false;
+        duplicates[this.cells[i].value] = true;
+        total += this.cells[i].value;
       }
+      if(unfilled) continue;
+      if(total !== targetConstraint.sum) return false;
     }
 
     return true;
@@ -101,22 +119,17 @@ export class BoardSolver {
     const actualIndex = this.cellIndices[singleIndex];
     const i = Math.floor(actualIndex / this.boardState[0].length);
     const j = actualIndex % this.boardState[0].length;
-    this.boardState[i][j].displayData[0] = this.cells[singleIndex].value.toString();
+    const v = this.cells[singleIndex].value;
+    this.boardState[i][j].displayData[0] = v === -1 ? '' : v.toString();
   }
 
   *FindSolution(instant: boolean) {
-    let currentTime = performance.now();
-    
     this.Initialize();
+    
+    let currentTime = performance.now();
+    let curIndex = 0;
 
-    for(let i = 0; i < this.cells.length; i++) {
-      this.cells[i].value = 1
-      this.UpdateCell(i);
-    }
-
-    while(!this.ValidateBoard()) {
-      let impossible = true;
-
+    while(curIndex < this.cells.length) {
       if(!instant) {
         yield this.boardState;
       } else if(performance.now() - currentTime > 10) {
@@ -124,23 +137,17 @@ export class BoardSolver {
         currentTime = performance.now();
       }
 
-      this.cells[0].value += 1;
-
-      for(let i = 0; i < this.cells.length; i++) {
-        if(this.cells[i].value !== 10) {
-          this.UpdateCell(i);
-          impossible = false;
-          break;
-        }
-
-        this.cells[i].value = 1;
-        if(i + 1 < this.cells.length) {
-          this.cells[i+1].value = this.cells[i+1].value + 1;
-        }
-        this.UpdateCell(i);
+      if(this.ValidateCell(curIndex)) {
+        curIndex += 1;
+      } else if(this.cells[curIndex].options.length > 0) {
+        this.cells[curIndex].value = this.cells[curIndex].options.pop() || -1;
+        this.UpdateCell(curIndex);
+      } else {
+        this.cells[curIndex].reset();
+        this.UpdateCell(curIndex);
+        this.cells[curIndex - 1].value = -1;
+        curIndex -= 1;
       }
-
-      if(impossible) break;
     }
 
     yield this.boardState;

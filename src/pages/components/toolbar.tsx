@@ -178,6 +178,18 @@ function triggerSolve(props: ToolbarProps) {
   step();
 }
 
+/** Removes all display values from puzzle cells */
+function removeDisplay(boardState: BoardCellType[][]) {
+  for(let i = 0; i < boardState.length; i++ ) {
+    for(let j = 0; j < boardState[0].length; j++) {
+      if(boardState[i][j].type === CELL_TYPE.PUZZLE) {
+        boardState[i][j].displayData[0] = '';
+      }
+    }
+  }
+  return boardState;
+}
+
 const NavButton = (props: ToolbarProps, left: boolean) =>
 <button
   className={`m-5 border rounded-lg bg-black w-10 disabled:opacity-0`}
@@ -246,6 +258,7 @@ const SolvePageTools = (props: ToolbarProps) =>
     onClick={() => {
       clearTimeout(currentStepFn);
       props.setToolPage(TOOL_PAGE.HINTS);
+      props.setBoard({...props.board, state: removeDisplay(props.board.state)})
     }}
   >{"Back"}</button>
 </div>
