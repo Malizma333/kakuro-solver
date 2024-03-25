@@ -78,7 +78,7 @@ function validateBoard(props: ToolbarProps) {
 function triggerSolve(props: ToolbarProps) {
   if(!validateBoard(props)) return;
 
-  props.setToolPage(-1);
+  props.setToolPage(TOOL_PAGE.HIDDEN);
 
   const boardGenerator = new BoardSolver(props.board.state).FindSolution(props.instant);
 

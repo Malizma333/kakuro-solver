@@ -15,6 +15,104 @@ export interface BoardCellType {
   lengthData: number[];
 };
 
+/** Creates demo board for the info page */
+export function getExampleBoard() {
+  return {
+    width: 8,
+    height: 9,
+    state: [
+      [
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 2, displayData: ["", "18"], lengthData: [-1, 4] },
+        { type: 2, displayData: ["", "11"], lengthData: [-1, 2] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+      ],
+      [
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 2, displayData: ["16", "16"], lengthData: [2, 2] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 2, displayData: ["", "9"], lengthData: [-1, 2] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+      ],
+      [
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 2, displayData: ["20", ""], lengthData: [4, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 2, displayData: ["", "16"], lengthData: [-1, 2] },
+        { type: 2, displayData: ["", "9"], lengthData: [-1, 2] },
+      ],
+      [
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 2, displayData: ["", "17"], lengthData: [-1, 2] },
+        { type: 2, displayData: ["9", "13"], lengthData: [2, 2] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 2, displayData: ["21", "16"], lengthData: [3, 4] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+      ],
+      [
+        { type: 2, displayData: ["17", ""], lengthData: [2, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 2, displayData: ["11", "12"], lengthData: [2, 2] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 2, displayData: ["10", "12"], lengthData: [2, 2] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+      ],
+      [
+        { type: 2, displayData: ["22", ""], lengthData: [3, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 2, displayData: ["8", "13"], lengthData: [2, 2] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+      ],
+      [
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 2, displayData: ["14", ""], lengthData: [4, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: ["5"], lengthData: [-1, -1] },
+        { type: 1, displayData: ["6"], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+      ],
+      [
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 2, displayData: ["14", ""], lengthData: [2, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 1, displayData: [""], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+        { type: 0, displayData: [], lengthData: [-1, -1] },
+      ],
+    ],
+  };
+}
+
 /** Initializes a new board object */
 export function getNewBoard() {
   return {
